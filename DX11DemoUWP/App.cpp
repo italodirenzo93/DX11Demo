@@ -59,8 +59,7 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
     {
         window.Closed([this](auto&&, auto&&) { m_exit = true; });
 
-        auto windowPtr = static_cast<::IUnknown*>(winrt::get_abi(window));
-        m_scene->Initialize(windowPtr, int(window.Bounds().Width), int(window.Bounds().Height));
+        m_scene->Initialize(window, int(window.Bounds().Width), int(window.Bounds().Height));
     }
 
     void OnActivated(CoreApplicationView const& /* applicationView */, IActivatedEventArgs const& /* args */)

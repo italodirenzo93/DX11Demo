@@ -41,14 +41,17 @@ SampleScene::~SampleScene()
 {
 }
 
-void SampleScene::Initialize(::IUnknown* window, int width, int height)
+void SampleScene::Initialize(const winrt::Windows::UI::Core::CoreWindow& window, int width, int height)
 {
-	m_window = window;
+	m_window = winrt::get_unknown(window);
 
 	m_deviceResources->CreateDeviceResources();
 	CreateDeviceDependentResources();
 
 	OnWindowSizeChanged(width, height);
+
+	m_keyboard->SetWindow(window);
+	m_mouse->SetWindow(window);
 }
 
 void SampleScene::OnWindowSizeChanged(int width, int height)

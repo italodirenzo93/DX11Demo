@@ -14,7 +14,7 @@ public:
 	SampleScene();
 	~SampleScene();
 
-	void Initialize(::IUnknown* window, int width, int height);
+	void Initialize(const winrt::Windows::UI::Core::CoreWindow& window, int width, int height);
 	void OnWindowSizeChanged(int width, int height);
 	void Tick();
 
