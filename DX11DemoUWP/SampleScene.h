@@ -34,6 +34,7 @@ private:
 	std::unique_ptr<DirectX::CommonStates> m_commonStates;
 	std::unique_ptr<DirectX::Keyboard> m_keyboard;
 	std::unique_ptr<DirectX::Mouse> m_mouse;
+	std::unique_ptr<DirectX::GamePad> m_gamepad;
 
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader;

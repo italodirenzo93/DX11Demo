@@ -34,6 +34,7 @@ SampleScene::SampleScene()
 	m_deviceResources = std::make_unique<DeviceResources>();
 	m_keyboard = std::make_unique<Keyboard>();
 	m_mouse = std::make_unique<Mouse>();
+	m_gamepad = std::make_unique<GamePad>();
 	m_window = nullptr;
 }
 
