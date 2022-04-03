@@ -25,12 +25,20 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
     {
         applicationView.Activated({ this, &App::OnActivated });
 
+        // UWP on Xbox One triggers a back request whenever the B button is pressed
+        // which can result in the app being suspended if unhandled
+        //auto navigation = SystemNavigationManager::GetForCurrentView();
+
+        //navigation.BackRequested([](const winrt::Windows::Foundation::IInspectable&, const BackRequestedEventArgs& args)
+        //    {
+        //        args.Handled(true);
+        //    });
+
         m_scene = std::make_unique<SampleScene>();
     }
 
     void Load(hstring const&)
     {
-        
     }
 
     void Uninitialize()
@@ -62,10 +70,16 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
         m_scene->Initialize(window, int(window.Bounds().Width), int(window.Bounds().Height));
     }
 
+protected:
     void OnActivated(CoreApplicationView const& /* applicationView */, IActivatedEventArgs const& /* args */)
     {
         CoreWindow window = CoreWindow::GetForCurrentThread();
         window.Activate();
+    }
+
+    void OnWindowSizeChanged(CoreWindow const& sender, WindowSizeChangedEventArgs const& /*args*/)
+    {
+        m_scene->OnWindowSizeChanged(sender.Bounds().Width, sender.Bounds().Height);
     }
 
 private:
@@ -77,4 +91,10 @@ private:
 int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 {
     CoreApplication::Run(make<App>());
+}
+
+// Exit helper
+void ExitApplication() noexcept
+{
+    winrt::Windows::ApplicationModel::Core::CoreApplication::Exit();
 }

@@ -8,6 +8,8 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 using Microsoft::WRL::ComPtr;
 
+extern void ExitApplication() noexcept;
+
 struct VertexType
 {
 	Vector3 Position;
@@ -156,6 +158,11 @@ void SampleScene::CreateWindowSizeDependentResources()
 
 void SampleScene::Update(const StepTimer& timer)
 {
+	if (m_gamepad->GetState(0).IsStartPressed())
+	{
+		ExitApplication();
+	}
+
 	const float elapsed = float(timer.GetTotalSeconds());
 
 	m_world = Matrix::CreateRotationZ(elapsed);
