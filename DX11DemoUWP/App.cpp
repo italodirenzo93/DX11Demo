@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "SampleScene.h"
 
+#include <winrt/Windows.UI.Popups.h>
+
+using namespace DirectX;
 using namespace winrt;
 using namespace winrt::Windows;
 using namespace winrt::Windows::ApplicationModel::Activation;
@@ -25,20 +28,19 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
     {
         applicationView.Activated({ this, &App::OnActivated });
 
-        // UWP on Xbox One triggers a back request whenever the B button is pressed
-        // which can result in the app being suspended if unhandled
-        //auto navigation = SystemNavigationManager::GetForCurrentView();
-
-        //navigation.BackRequested([](const winrt::Windows::Foundation::IInspectable&, const BackRequestedEventArgs& args)
-        //    {
-        //        args.Handled(true);
-        //    });
-
         m_scene = std::make_unique<SampleScene>();
     }
 
     void Load(hstring const&)
     {
+        // UWP on Xbox One triggers a back request whenever the B button is pressed
+        // which can result in the app being suspended if unhandled
+        auto navigation = SystemNavigationManager::GetForCurrentView();
+
+        navigation.BackRequested([](const winrt::Windows::Foundation::IInspectable&, const BackRequestedEventArgs& args)
+            {
+                args.Handled(true);
+            });
     }
 
     void Uninitialize()
@@ -97,5 +99,5 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 // Exit helper
 void ExitApplication() noexcept
 {
-    winrt::Windows::ApplicationModel::Core::CoreApplication::Exit();
+    CoreApplication::Exit();
 }

@@ -46,6 +46,8 @@ private:
 
 	DirectX::ConstantBuffer<VS_CONSTANT_BUFFER> m_constantBuffer;
 
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_cubeTexture;
+
 	DirectX::SimpleMath::Matrix m_world;
 	DirectX::SimpleMath::Matrix m_view;
 	DirectX::SimpleMath::Matrix m_projection;
