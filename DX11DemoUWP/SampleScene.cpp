@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "SampleScene.h"
 
+#include <GeometricPrimitive.h>
+
 #include "ReadData.h"
 
 using namespace DX;
@@ -12,20 +14,14 @@ extern void ExitApplication() noexcept;
 
 struct VertexType
 {
-	Vector3 Position;
-	Vector3 Color;
+	Vector3 position;
+	Vector3 color;
 
 	VertexType()
-		: Position(Vector3::Zero), Color(Vector3::One) {}
+		: position(Vector3::Zero), color(Vector3::One) {}
 
 	VertexType(const Vector3& pos, const XMVECTOR& color)
-		: Position(pos), Color(color) {}
-};
-
-static const std::vector<VertexType> triangleVertices{
-	VertexType(Vector3(0.0f, 0.5f, 0.0f), Colors::Red),
-	VertexType(Vector3(0.5f, -0.5f, 0.0f), Colors::Green),
-	VertexType(Vector3(-0.5f, -0.5f, 0.0f), Colors::Blue),
+		: position(pos), color(color) {}
 };
 
 static UINT stride = sizeof(VertexType);
@@ -135,9 +131,29 @@ void SampleScene::CreateDeviceDependentResources()
 
 	// Create Vertex Buffer
 	{
+		GeometricPrimitive::VertexCollection vertices;
+		GeometricPrimitive::IndexCollection indices;
+		GeometricPrimitive::CreateCube(vertices, indices);
+
+		std::vector<VertexType> newVerts;
+		newVerts.reserve(vertices.size());
+		for (const auto& v : vertices)
+		{
+			VertexType vert;
+			vert.position = v.position;
+			vert.color = Vector3(v.normal.x, v.normal.y, v.normal.z);
+			newVerts.emplace_back(vert);
+		}
+
 		ThrowIfFailed(
-			CreateStaticBuffer(m_deviceResources->GetDevice(), triangleVertices, D3D11_BIND_VERTEX_BUFFER, m_vertexBuffer.ReleaseAndGetAddressOf())
+			CreateStaticBuffer(m_deviceResources->GetDevice(), newVerts, D3D11_BIND_VERTEX_BUFFER, m_vertexBuffer.ReleaseAndGetAddressOf())
 		);
+
+		ThrowIfFailed(
+			CreateStaticBuffer(m_deviceResources->GetDevice(), indices, D3D11_BIND_INDEX_BUFFER, m_indexBuffer.ReleaseAndGetAddressOf())
+		);
+
+		m_indexCount = static_cast<UINT>(indices.size());
 	}
 
 	// Create constant buffer
@@ -158,14 +174,14 @@ void SampleScene::CreateWindowSizeDependentResources()
 
 void SampleScene::Update(const StepTimer& timer)
 {
-	if (m_gamepad->GetState(0).IsStartPressed())
+	if (m_keyboard->GetState().Escape || m_gamepad->GetState(0).IsStartPressed())
 	{
 		ExitApplication();
 	}
 
 	const float elapsed = float(timer.GetTotalSeconds());
 
-	m_world = Matrix::CreateRotationZ(elapsed);
+	m_world = Matrix::CreateRotationY(elapsed);
 
 	VS_CONSTANT_BUFFER cb = {};
 	cb.matWorldViewProj = m_world * m_view * m_projection;
@@ -192,6 +208,7 @@ void SampleScene::Render()
 
 	const auto vertexBuffers = m_vertexBuffer.Get();
 	ctx->IASetVertexBuffers(0, 1, &vertexBuffers, &stride, &offset);
+	ctx->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
 
 	const auto constantBuffers = m_constantBuffer.GetBuffer();
 	ctx->VSSetConstantBuffers(0, 1, &constantBuffers);
@@ -199,7 +216,7 @@ void SampleScene::Render()
 	ctx->VSSetShader(m_vertexShader.Get(), nullptr, 0);
 	ctx->PSSetShader(m_pixelShader.Get(), nullptr, 0);
 
-	ctx->Draw(static_cast<UINT>(triangleVertices.size()), 0);
+	ctx->DrawIndexed(m_indexCount, 0, 0);
 
 	m_deviceResources->GetSwapChain()->Present(1, 0);
 }

@@ -66,6 +66,7 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
     void SetWindow(CoreWindow const& window)
     {
         window.Closed([this](auto&&, auto&&) { m_exit = true; });
+        window.SizeChanged({ this, &App::OnWindowSizeChanged });
 
         m_scene->Initialize(window, int(window.Bounds().Width), int(window.Bounds().Height));
     }
