@@ -1,8 +1,4 @@
-struct ps_in
-{
-	float4 position : SV_POSITION;
-	float2 tex : TEXCOORD0;
-};
+#include "common.hlsli"
 
 Texture2D shaderTexture;
 SamplerState sampleType;

@@ -3,15 +3,11 @@ cbuffer VS_CONSTANT_BUFFER : register(b0)
 	matrix matWorldViewProj;
 }
 
+#include "common.hlsli"
+
 struct vs_in
 {
 	float3 position : POSITION;
-	float2 tex : TEXCOORD0;
-};
-
-struct ps_in
-{
-	float4 position : SV_POSITION;
 	float2 tex : TEXCOORD0;
 };
 
