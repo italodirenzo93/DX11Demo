@@ -29,7 +29,7 @@ private:
 
 	DX::StepTimer m_timer;
 
-	std::unique_ptr<DX::DeviceResources> m_deviceResources;
+	std::unique_ptr<DeviceResources> m_deviceResources;
 
 	std::unique_ptr<DirectX::CommonStates> m_commonStates;
 	std::unique_ptr<DirectX::Keyboard> m_keyboard;

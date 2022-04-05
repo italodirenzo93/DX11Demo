@@ -178,13 +178,14 @@ void SampleScene::Render()
 
 	ID3D11RenderTargetView* rtv = m_deviceResources->GetRenderTarget();
 	ctx->ClearRenderTargetView(rtv, Colors::CornflowerBlue);
+	ctx->ClearDepthStencilView(m_deviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	ctx->RSSetViewports(1, m_deviceResources->GetViewport().Get11());
 	ctx->RSSetState(m_commonStates->CullNone());
 
 	ctx->OMSetBlendState(m_commonStates->Opaque(), Colors::White, 0xFFFFFFFF);
 	ctx->OMSetDepthStencilState(m_commonStates->DepthDefault(), 0);
-	ctx->OMSetRenderTargets(1, &rtv, nullptr);
+	ctx->OMSetRenderTargets(1, &rtv, m_deviceResources->GetDepthStencilView());
 
 	ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	ctx->IASetInputLayout(m_inputLayout.Get());

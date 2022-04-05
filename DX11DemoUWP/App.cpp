@@ -79,7 +79,7 @@ protected:
 
     void OnWindowSizeChanged(CoreWindow const& sender, WindowSizeChangedEventArgs const& /*args*/)
     {
-        m_scene->OnWindowSizeChanged(sender.Bounds().Width, sender.Bounds().Height);
+        m_scene->OnWindowSizeChanged(int(sender.Bounds().Width), int(sender.Bounds().Height));
     }
 
 private:
