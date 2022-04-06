@@ -30,6 +30,8 @@
 #include <exception>
 #include <memory>
 #include <string>
+#include <thread>
+#include <mutex>
 #include <vector>
 
 // DirectXTK helpers

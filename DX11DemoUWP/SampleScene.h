@@ -26,6 +26,8 @@ private:
 
 	DX::StepTimer m_timer;
 
+	std::thread m_renderThread;
+
 	std::unique_ptr<DeviceResources> m_deviceResources;
 	std::unique_ptr<MyEffect> m_effect;
 
@@ -38,6 +40,9 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_cubeTexture;
+
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext3> m_deferredContext;
+	Microsoft::WRL::ComPtr<ID3D11CommandList> m_commandList;
 
 	::IUnknown* m_window;
 };

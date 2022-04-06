@@ -23,6 +23,7 @@ SampleScene::SampleScene()
 
 SampleScene::~SampleScene()
 {
+	m_renderThread.join();
 }
 
 void SampleScene::Initialize(const winrt::Windows::UI::Core::CoreWindow& window, int width, int height)
@@ -64,6 +65,8 @@ void SampleScene::GetDefaultSize(int& width, int& height) const noexcept
 void SampleScene::CreateDeviceDependentResources()
 {
 	const auto device = m_deviceResources->GetDevice();
+
+	ThrowIfFailed(device->CreateDeferredContext3(0, m_deferredContext.ReleaseAndGetAddressOf()));
 
 	// Init common states
 	m_commonStates = std::make_unique<CommonStates>(device);
@@ -110,6 +113,35 @@ void SampleScene::CreateDeviceDependentResources()
 
 		m_effect->SetTexture(m_cubeTexture.Get());
 	}
+
+	m_renderThread = std::thread([&]()
+		{
+			while (true)
+			{
+				// Draw each cube
+				for (auto& obj : m_objects)
+				{
+					const auto vertexBuffers = obj.GetVertexBuffer();
+					const auto strides = obj.GetStride();
+					const UINT offsets = 0;
+
+					// Input assembler
+					m_deferredContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+					m_deferredContext->IASetInputLayout(m_inputLayout.Get());
+
+					m_deferredContext->IASetVertexBuffers(0, 1, &vertexBuffers, &strides, &offsets);
+					m_deferredContext->IASetIndexBuffer(obj.GetIndexBuffer(), DXGI_FORMAT_R16_UINT, 0);
+
+					m_effect->SetWorld(obj.GetWorldMatrix());
+					m_effect->Apply(m_deferredContext.Get());
+
+					// Draw things
+					m_deferredContext->DrawIndexed(obj.GetElementCount(), 0, 0);
+				}
+
+				m_deferredContext->FinishCommandList(false, m_commandList.ReleaseAndGetAddressOf());
+			}
+		});
 }
 
 void SampleScene::CreateWindowSizeDependentResources()
@@ -157,24 +189,9 @@ void SampleScene::Render()
 	ctx->OMSetDepthStencilState(m_commonStates->DepthDefault(), 0);
 	ctx->OMSetRenderTargets(1, &rtv, m_deviceResources->GetDepthStencilView());
 
-	// Input assembler
-	ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	ctx->IASetInputLayout(m_inputLayout.Get());
-
-	// Draw each cube
-	for (auto& obj : m_objects)
+	if (m_commandList)
 	{
-		const auto vertexBuffers = obj.GetVertexBuffer();
-		const auto strides = obj.GetStride();
-		const UINT offsets = 0;
-		ctx->IASetVertexBuffers(0, 1, &vertexBuffers, &strides, &offsets);
-		ctx->IASetIndexBuffer(obj.GetIndexBuffer(), DXGI_FORMAT_R16_UINT, 0);
-
-		m_effect->SetWorld(obj.GetWorldMatrix());
-		m_effect->Apply(ctx);
-
-		// Draw things
-		ctx->DrawIndexed(obj.GetElementCount(), 0, 0);
+		ctx->ExecuteCommandList(m_commandList.Get(), true);
 	}
 
 	// Show the back buffer
