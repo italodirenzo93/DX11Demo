@@ -16,6 +16,8 @@ public:
 	void SetTexture(ID3D11ShaderResourceView* texture);
 
 private:
+	std::unique_ptr<DirectX::CommonStates> m_commonStates;
+
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vs;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_ps;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;

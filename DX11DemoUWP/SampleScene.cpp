@@ -113,21 +113,43 @@ void SampleScene::CreateDeviceDependentResources()
 
 		m_effect->SetTexture(m_cubeTexture.Get());
 	}
+}
+
+void SampleScene::CreateWindowSizeDependentResources()
+{
+	const auto vp = m_deviceResources->GetViewport();
+
+	m_effect->SetProjection( XMMatrixPerspectiveFovLH(XM_PI / 4.f, vp.AspectRatio(), 0.1f, 10.f) );
+	m_effect->SetView( XMMatrixLookAtLH(Vector3(0.0f, 1.0f, -3.0f), Vector3::Zero, Vector3::UnitY) );
 
 	m_renderThread = std::thread([&]()
 		{
 			while (true)
 			{
+				// Clear render targets
+				ID3D11RenderTargetView* rtv = m_deviceResources->GetRenderTarget();
+				m_deferredContext->ClearRenderTargetView(rtv, Colors::CornflowerBlue);
+				m_deferredContext->ClearDepthStencilView(m_deviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+				// Rasterizer state
+				m_deferredContext->RSSetViewports(1, m_deviceResources->GetViewport().Get11());
+				m_deferredContext->RSSetState(m_commonStates->CullNone());
+
+				// Output-merger
+				m_deferredContext->OMSetBlendState(m_commonStates->Opaque(), Colors::White, 0xFFFFFFFF);
+				m_deferredContext->OMSetDepthStencilState(m_commonStates->DepthDefault(), 0);
+				m_deferredContext->OMSetRenderTargets(1, &rtv, m_deviceResources->GetDepthStencilView());
+
+				// Input assembler
+				m_deferredContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				m_deferredContext->IASetInputLayout(m_inputLayout.Get());
+
 				// Draw each cube
 				for (auto& obj : m_objects)
 				{
 					const auto vertexBuffers = obj.GetVertexBuffer();
 					const auto strides = obj.GetStride();
 					const UINT offsets = 0;
-
-					// Input assembler
-					m_deferredContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-					m_deferredContext->IASetInputLayout(m_inputLayout.Get());
 
 					m_deferredContext->IASetVertexBuffers(0, 1, &vertexBuffers, &strides, &offsets);
 					m_deferredContext->IASetIndexBuffer(obj.GetIndexBuffer(), DXGI_FORMAT_R16_UINT, 0);
@@ -142,14 +164,6 @@ void SampleScene::CreateDeviceDependentResources()
 				m_deferredContext->FinishCommandList(false, m_commandList.ReleaseAndGetAddressOf());
 			}
 		});
-}
-
-void SampleScene::CreateWindowSizeDependentResources()
-{
-	const auto vp = m_deviceResources->GetViewport();
-
-	m_effect->SetProjection( XMMatrixPerspectiveFovLH(XM_PI / 4.f, vp.AspectRatio(), 0.1f, 10.f) );
-	m_effect->SetView( XMMatrixLookAtLH(Vector3(0.0f, 1.0f, -3.0f), Vector3::Zero, Vector3::UnitY) );
 }
 
 void SampleScene::Update(const StepTimer& timer)
@@ -174,20 +188,6 @@ void SampleScene::Update(const StepTimer& timer)
 void SampleScene::Render()
 {
 	const auto ctx = m_deviceResources->GetDeviceContext();
-
-	// Clear render targets
-	ID3D11RenderTargetView* rtv = m_deviceResources->GetRenderTarget();
-	ctx->ClearRenderTargetView(rtv, Colors::CornflowerBlue);
-	ctx->ClearDepthStencilView(m_deviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-
-	// Rasterizer state
-	ctx->RSSetViewports(1, m_deviceResources->GetViewport().Get11());
-	ctx->RSSetState(m_commonStates->CullNone());
-
-	// Output-merger
-	ctx->OMSetBlendState(m_commonStates->Opaque(), Colors::White, 0xFFFFFFFF);
-	ctx->OMSetDepthStencilState(m_commonStates->DepthDefault(), 0);
-	ctx->OMSetRenderTargets(1, &rtv, m_deviceResources->GetDepthStencilView());
 
 	if (m_commandList)
 	{

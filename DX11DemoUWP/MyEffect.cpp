@@ -24,6 +24,8 @@ MyEffect::MyEffect(ID3D11Device* device)
 	auto psBlob = ReadData(L"PixelShader.cso");
 
 	ThrowIfFailed(device->CreatePixelShader(psBlob.data(), psBlob.size(), nullptr, m_ps.ReleaseAndGetAddressOf()));
+
+	m_commonStates = std::make_unique<CommonStates>(device);
 }
 
 void MyEffect::Apply(ID3D11DeviceContext* deviceContext)
@@ -50,6 +52,8 @@ void MyEffect::Apply(ID3D11DeviceContext* deviceContext)
 	const auto cb = m_constantBuffer.GetBuffer();
 	deviceContext->VSSetConstantBuffers(0, 1, &cb);
 	deviceContext->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
+	const auto samplers = m_commonStates->PointWrap();
+	deviceContext->PSSetSamplers(0, 1, &samplers);
 
 	deviceContext->VSSetShader(m_vs.Get(), nullptr, 0);
 	deviceContext->PSSetShader(m_ps.Get(), nullptr, 0);
