@@ -13,15 +13,6 @@ using Microsoft::WRL::ComPtr;
 
 extern void ExitApplication() noexcept;
 
-struct VertexType
-{
-	Vector3 position;
-	Vector2 tex;
-};
-
-static UINT stride = sizeof(VertexType);
-static UINT offset = 0;
-
 SampleScene::SampleScene()
 {
 	m_deviceResources = std::make_unique<DeviceResources>();
@@ -75,6 +66,7 @@ void SampleScene::CreateDeviceDependentResources()
 {
 	// Init common states
 	m_commonStates = std::make_unique<CommonStates>(m_deviceResources->GetDevice());
+	m_cubeObject = std::make_unique<CubeObject>(m_deviceResources->GetDevice());
 
 	ComPtr<ID3DBlob> shaderBlob;
 	ComPtr<ID3DBlob> errorBlob;
@@ -124,33 +116,6 @@ void SampleScene::CreateDeviceDependentResources()
 		);
 	}
 
-	// Create Vertex Buffer
-	{
-		GeometricPrimitive::VertexCollection vertices;
-		GeometricPrimitive::IndexCollection indices;
-		GeometricPrimitive::CreateCube(vertices, indices);
-
-		std::vector<VertexType> newVerts;
-		newVerts.reserve(vertices.size());
-		for (const auto& v : vertices)
-		{
-			VertexType vert;
-			vert.position = v.position;
-			vert.tex = v.textureCoordinate;
-			newVerts.emplace_back(vert);
-		}
-
-		ThrowIfFailed(
-			CreateStaticBuffer(m_deviceResources->GetDevice(), newVerts, D3D11_BIND_VERTEX_BUFFER, m_vertexBuffer.ReleaseAndGetAddressOf())
-		);
-
-		ThrowIfFailed(
-			CreateStaticBuffer(m_deviceResources->GetDevice(), indices, D3D11_BIND_INDEX_BUFFER, m_indexBuffer.ReleaseAndGetAddressOf())
-		);
-
-		m_indexCount = static_cast<UINT>(indices.size());
-	}
-
 	// Create constant buffer
 	{
 		m_constantBuffer.Create(m_deviceResources->GetDevice());
@@ -174,24 +139,26 @@ void SampleScene::CreateWindowSizeDependentResources()
 {
 	const auto vp = m_deviceResources->GetViewport();
 
-	m_projection = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f, vp.AspectRatio(), 0.1f, 10.f);
-	m_view = Matrix::CreateLookAt(Vector3(0.0f, 2.0f, -3.0f), Vector3::Zero, Vector3::UnitY);
-	m_world = Matrix::Identity;
+	m_projection = XMMatrixPerspectiveFovLH(XM_PI / 4.f, vp.AspectRatio(), 0.1f, 10.f);
+	m_view = XMMatrixLookAtLH(Vector3(0.0f, 1.0f, -3.0f), Vector3::Zero, Vector3::UnitY);
 }
 
 void SampleScene::Update(const StepTimer& timer)
 {
-	if (m_keyboard->GetState().Escape || m_gamepad->GetState(0).IsBPressed())
+	const auto keyboard = m_keyboard->GetState();
+	const auto gamepad = m_gamepad->GetState(0);
+
+	if (keyboard.Escape || gamepad.IsBPressed())
 	{
 		ExitApplication();
 	}
-
+	
 	const float elapsed = float(timer.GetTotalSeconds());
 
-	m_world = Matrix::CreateRotationY(elapsed);
+	m_cubeObject->worldRotation = Quaternion::CreateFromAxisAngle(Vector3::UnitY, elapsed).ToEuler();
 
 	VS_CONSTANT_BUFFER cb = {};
-	cb.matWorldViewProj = m_world * m_view * m_projection;
+	cb.matWorldViewProj = m_cubeObject->GetWorldMatrix() * m_view * m_projection;
 	m_constantBuffer.SetData(m_deviceResources->GetDeviceContext(), cb);
 }
 
@@ -217,9 +184,11 @@ void SampleScene::Render()
 	ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	ctx->IASetInputLayout(m_inputLayout.Get());
 
-	const auto vertexBuffers = m_vertexBuffer.Get();
-	ctx->IASetVertexBuffers(0, 1, &vertexBuffers, &stride, &offset);
-	ctx->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+	const auto vertexBuffers = m_cubeObject->GetVertexBuffer();
+	const auto strides = m_cubeObject->GetStride();
+	const UINT offsets = 0;
+	ctx->IASetVertexBuffers(0, 1, &vertexBuffers, &strides, &offsets);
+	ctx->IASetIndexBuffer(m_cubeObject->GetIndexBuffer(), DXGI_FORMAT_R16_UINT, 0);
 
 	// Vertex shader
 	const auto constantBuffers = m_constantBuffer.GetBuffer();
@@ -235,7 +204,7 @@ void SampleScene::Render()
 	ctx->PSSetShaderResources(0, 1, &psResources);
 
 	// Draw things
-	ctx->DrawIndexed(m_indexCount, 0, 0);
+	ctx->DrawIndexed(m_cubeObject->GetElementCount(), 0, 0);
 
 	// Show the back buffer
 	m_deviceResources->GetSwapChain()->Present(1, 0);

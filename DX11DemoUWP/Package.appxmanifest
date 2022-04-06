@@ -6,8 +6,8 @@
     Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="82a1e499-d0a8-4e65-8279-aa3437fefe6e" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
   <Properties>
-    <DisplayName>DX11DemoUWP</DisplayName>
-    <PublisherDisplayName>Italo</PublisherDisplayName>
+    <DisplayName>DX11Demo</DisplayName>
+    <PublisherDisplayName>Italo Di Renzo</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
   <Dependencies>
@@ -18,9 +18,10 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="DX11DemoUWP.App">
-      <uap:VisualElements DisplayName="DX11DemoUWP" Description="A project for a C++/WinRT Universal Windows Platform (UWP) app directly implementing CoreApplication"
+      <uap:VisualElements DisplayName="Direct X 11 Demo" Description="A project for a C++/WinRT Universal Windows Platform (UWP) app directly implementing CoreApplication"
         Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" BackgroundColor="transparent">
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
+        <uap:DefaultTile/>
       </uap:VisualElements>
     </Application>
   </Applications>

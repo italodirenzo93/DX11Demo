@@ -2,6 +2,7 @@
 
 #include "StepTimer.h"
 #include "DeviceResources.h"
+#include "CubeObject.h"
 
 struct VS_CONSTANT_BUFFER
 {
@@ -30,6 +31,7 @@ private:
 	DX::StepTimer m_timer;
 
 	std::unique_ptr<DeviceResources> m_deviceResources;
+	std::unique_ptr<CubeObject> m_cubeObject;
 
 	std::unique_ptr<DirectX::CommonStates> m_commonStates;
 	std::unique_ptr<DirectX::Keyboard> m_keyboard;
@@ -39,16 +41,12 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader;
 
-	Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer;
-	Microsoft::WRL::ComPtr<ID3D11Buffer> m_indexBuffer;
-	UINT m_indexCount;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
 
 	DirectX::ConstantBuffer<VS_CONSTANT_BUFFER> m_constantBuffer;
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_cubeTexture;
 
-	DirectX::SimpleMath::Matrix m_world;
 	DirectX::SimpleMath::Matrix m_view;
 	DirectX::SimpleMath::Matrix m_projection;
 
