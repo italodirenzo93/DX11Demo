@@ -27,8 +27,9 @@ private:
 	DX::StepTimer m_timer;
 
 	std::unique_ptr<DeviceResources> m_deviceResources;
-	std::unique_ptr<CubeObject> m_cubeObject;
 	std::unique_ptr<MyEffect> m_effect;
+
+	std::vector<CubeObject> m_objects;
 
 	std::unique_ptr<DirectX::CommonStates> m_commonStates;
 	std::unique_ptr<DirectX::Keyboard> m_keyboard;

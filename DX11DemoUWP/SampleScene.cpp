@@ -2,7 +2,6 @@
 #include "SampleScene.h"
 
 #include <DDSTextureLoader.h>
-#include <GeometricPrimitive.h>
 
 #include "ReadData.h"
 
@@ -68,8 +67,17 @@ void SampleScene::CreateDeviceDependentResources()
 
 	// Init common states
 	m_commonStates = std::make_unique<CommonStates>(device);
-	m_cubeObject = std::make_unique<CubeObject>(device);
 	m_effect = std::make_unique<MyEffect>(device);
+
+	CubeObject c1(device), c2(device), c3(device);
+
+	c1.worldPosition = Vector3(1.0f, -1.0f, 1.5f);
+	c2.worldPosition = Vector3(-1.0f, 1.0f, 1.5f);
+	c3.worldPosition = Vector3(0.0f, 0.0f, 2.5f);
+
+	m_objects.push_back(c1);
+	m_objects.push_back(c2);
+	m_objects.push_back(c3);
 
 	// Vertex program
 	{
@@ -124,10 +132,11 @@ void SampleScene::Update(const StepTimer& timer)
 
 	const float elapsed = float(timer.GetTotalSeconds());
 
-	m_cubeObject->worldPosition = Vector3(1.0f, 0.0f, 2.0f);
-	m_cubeObject->worldRotation = Quaternion::CreateFromAxisAngle(Vector3::UnitY, elapsed).ToEuler();
-
-	m_effect->SetWorld( m_cubeObject->GetWorldMatrix() );
+	// Rotate each cube
+	for (auto& obj : m_objects)
+	{
+		obj.worldRotation = Quaternion::CreateFromAxisAngle(Vector3::UnitY, elapsed).ToEuler();
+	}
 }
 
 void SampleScene::Render()
@@ -152,16 +161,21 @@ void SampleScene::Render()
 	ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	ctx->IASetInputLayout(m_inputLayout.Get());
 
-	const auto vertexBuffers = m_cubeObject->GetVertexBuffer();
-	const auto strides = m_cubeObject->GetStride();
-	const UINT offsets = 0;
-	ctx->IASetVertexBuffers(0, 1, &vertexBuffers, &strides, &offsets);
-	ctx->IASetIndexBuffer(m_cubeObject->GetIndexBuffer(), DXGI_FORMAT_R16_UINT, 0);
+	// Draw each cube
+	for (auto& obj : m_objects)
+	{
+		const auto vertexBuffers = obj.GetVertexBuffer();
+		const auto strides = obj.GetStride();
+		const UINT offsets = 0;
+		ctx->IASetVertexBuffers(0, 1, &vertexBuffers, &strides, &offsets);
+		ctx->IASetIndexBuffer(obj.GetIndexBuffer(), DXGI_FORMAT_R16_UINT, 0);
 
-	m_effect->Apply(ctx);
+		m_effect->SetWorld(obj.GetWorldMatrix());
+		m_effect->Apply(ctx);
 
-	// Draw things
-	ctx->DrawIndexed(m_cubeObject->GetElementCount(), 0, 0);
+		// Draw things
+		ctx->DrawIndexed(obj.GetElementCount(), 0, 0);
+	}
 
 	// Show the back buffer
 	m_deviceResources->GetSwapChain()->Present(1, 0);
