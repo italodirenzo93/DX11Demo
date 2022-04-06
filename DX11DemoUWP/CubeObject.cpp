@@ -14,6 +14,14 @@ struct VertexType
 };
 
 CubeObject::CubeObject(ID3D11Device* device)
+	:
+	CubeObject(device, Vector3::Zero)
+{
+}
+
+CubeObject::CubeObject(ID3D11Device* device, const Vector3& position)
+	:
+	SceneObject(position)
 {
 	GeometricPrimitive::VertexCollection vertices;
 	GeometricPrimitive::IndexCollection indices;

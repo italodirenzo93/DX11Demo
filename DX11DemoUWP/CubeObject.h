@@ -5,7 +5,8 @@
 class CubeObject : public SceneObject
 {
 public:
-	explicit CubeObject(ID3D11Device*);
+	explicit CubeObject(ID3D11Device* device);
+	CubeObject(ID3D11Device* device, const DirectX::SimpleMath::Vector3& position);
 
 	ID3D11Buffer* GetVertexBuffer() const noexcept { return m_vertexBuffer.Get(); }
 	ID3D11Buffer* GetIndexBuffer() const noexcept { return m_indexBuffer.Get(); }

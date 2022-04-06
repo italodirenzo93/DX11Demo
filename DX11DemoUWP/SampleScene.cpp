@@ -69,15 +69,9 @@ void SampleScene::CreateDeviceDependentResources()
 	m_commonStates = std::make_unique<CommonStates>(device);
 	m_effect = std::make_unique<MyEffect>(device);
 
-	CubeObject c1(device), c2(device), c3(device);
-
-	c1.worldPosition = Vector3(1.0f, -1.0f, 1.5f);
-	c2.worldPosition = Vector3(-1.0f, 1.0f, 1.5f);
-	c3.worldPosition = Vector3(0.0f, 0.0f, 2.5f);
-
-	m_objects.push_back(c1);
-	m_objects.push_back(c2);
-	m_objects.push_back(c3);
+	m_objects.push_back(CubeObject(device, Vector3(1.0f, -1.0f, 1.5f)));
+	m_objects.push_back(CubeObject(device, Vector3(-1.0f, 1.0f, 1.5f)));
+	m_objects.push_back(CubeObject(device, Vector3(0.0f, 0.0f, 2.5f)));
 
 	// Vertex program
 	{
