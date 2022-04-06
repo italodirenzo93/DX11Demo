@@ -71,25 +71,16 @@ void SampleScene::CreateDeviceDependentResources()
 	m_cubeObject = std::make_unique<CubeObject>(device);
 	m_effect = std::make_unique<MyEffect>(device);
 
-	ComPtr<ID3DBlob> shaderBlob;
-	ComPtr<ID3DBlob> errorBlob;
-
 	// Vertex program
 	{
-		const D3D11_INPUT_ELEMENT_DESC layout[] =
-		{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		};
-
 		const void* bytecodeData;
 		size_t bytecodeLength;
 		m_effect->GetVertexShaderBytecode(&bytecodeData, &bytecodeLength);
 
 		ThrowIfFailed(
 			device->CreateInputLayout(
-				layout,
-				ARRAYSIZE(layout),
+				MyEffect::InputLayout,
+				MyEffect::InputLayoutCount,
 				bytecodeData,
 				bytecodeLength,
 				m_inputLayout.ReleaseAndGetAddressOf()
