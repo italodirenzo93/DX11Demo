@@ -64,74 +64,52 @@ void SampleScene::GetDefaultSize(int& width, int& height) const noexcept
 
 void SampleScene::CreateDeviceDependentResources()
 {
+	const auto device = m_deviceResources->GetDevice();
+
 	// Init common states
-	m_commonStates = std::make_unique<CommonStates>(m_deviceResources->GetDevice());
-	m_cubeObject = std::make_unique<CubeObject>(m_deviceResources->GetDevice());
+	m_commonStates = std::make_unique<CommonStates>(device);
+	m_cubeObject = std::make_unique<CubeObject>(device);
+	m_effect = std::make_unique<MyEffect>(device);
 
 	ComPtr<ID3DBlob> shaderBlob;
 	ComPtr<ID3DBlob> errorBlob;
 
 	// Vertex program
 	{
-		auto shaderBlob = ReadData(L"VertexShader.cso");
-
-		ThrowIfFailed(
-			m_deviceResources->GetDevice()->CreateVertexShader(
-				shaderBlob.data(),
-				shaderBlob.size(),
-				nullptr,
-				m_vertexShader.ReleaseAndGetAddressOf()
-			)
-		);
-
-
 		const D3D11_INPUT_ELEMENT_DESC layout[] =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
 
+		const void* bytecodeData;
+		size_t bytecodeLength;
+		m_effect->GetVertexShaderBytecode(&bytecodeData, &bytecodeLength);
+
 		ThrowIfFailed(
-			m_deviceResources->GetDevice()->CreateInputLayout(
+			device->CreateInputLayout(
 				layout,
 				ARRAYSIZE(layout),
-				shaderBlob.data(),
-				shaderBlob.size(),
+				bytecodeData,
+				bytecodeLength,
 				m_inputLayout.ReleaseAndGetAddressOf()
 			)
 		);
-	}
-
-	// Pixel program
-	{
-		auto shaderBlob = ReadData(L"PixelShader.cso");
-
-		ThrowIfFailed(
-			m_deviceResources->GetDevice()->CreatePixelShader(
-				shaderBlob.data(),
-				shaderBlob.size(),
-				nullptr,
-				m_pixelShader.ReleaseAndGetAddressOf()
-			)
-		);
-	}
-
-	// Create constant buffer
-	{
-		m_constantBuffer.Create(m_deviceResources->GetDevice());
 	}
 
 	// Load texture for cube
 	{
 		ThrowIfFailed(
 			CreateDDSTextureFromFile(
-				m_deviceResources->GetDevice(),
+				device,
 				m_deviceResources->GetDeviceContext(),
 				L"Assets/braynzar.dds",
 				nullptr,
 				m_cubeTexture.ReleaseAndGetAddressOf()
 			)
 		);
+
+		m_effect->SetTexture(m_cubeTexture.Get());
 	}
 }
 
@@ -139,8 +117,8 @@ void SampleScene::CreateWindowSizeDependentResources()
 {
 	const auto vp = m_deviceResources->GetViewport();
 
-	m_projection = XMMatrixPerspectiveFovLH(XM_PI / 4.f, vp.AspectRatio(), 0.1f, 10.f);
-	m_view = XMMatrixLookAtLH(Vector3(0.0f, 1.0f, -3.0f), Vector3::Zero, Vector3::UnitY);
+	m_effect->SetProjection( XMMatrixPerspectiveFovLH(XM_PI / 4.f, vp.AspectRatio(), 0.1f, 10.f) );
+	m_effect->SetView( XMMatrixLookAtLH(Vector3(0.0f, 1.0f, -3.0f), Vector3::Zero, Vector3::UnitY) );
 }
 
 void SampleScene::Update(const StepTimer& timer)
@@ -152,14 +130,13 @@ void SampleScene::Update(const StepTimer& timer)
 	{
 		ExitApplication();
 	}
-	
+
 	const float elapsed = float(timer.GetTotalSeconds());
 
+	m_cubeObject->worldPosition = Vector3(1.0f, 0.0f, 2.0f);
 	m_cubeObject->worldRotation = Quaternion::CreateFromAxisAngle(Vector3::UnitY, elapsed).ToEuler();
 
-	VS_CONSTANT_BUFFER cb = {};
-	cb.matWorldViewProj = m_cubeObject->GetWorldMatrix() * m_view * m_projection;
-	m_constantBuffer.SetData(m_deviceResources->GetDeviceContext(), cb);
+	m_effect->SetWorld( m_cubeObject->GetWorldMatrix() );
 }
 
 void SampleScene::Render()
@@ -190,18 +167,7 @@ void SampleScene::Render()
 	ctx->IASetVertexBuffers(0, 1, &vertexBuffers, &strides, &offsets);
 	ctx->IASetIndexBuffer(m_cubeObject->GetIndexBuffer(), DXGI_FORMAT_R16_UINT, 0);
 
-	// Vertex shader
-	const auto constantBuffers = m_constantBuffer.GetBuffer();
-	ctx->VSSetConstantBuffers(0, 1, &constantBuffers);
-	ctx->VSSetShader(m_vertexShader.Get(), nullptr, 0);
-
-	// Pixel shader
-	const auto samplerState = m_commonStates->PointClamp();
-	ctx->PSSetSamplers(0, 1, &samplerState);
-	ctx->PSSetShader(m_pixelShader.Get(), nullptr, 0);
-
-	const auto psResources = m_cubeTexture.Get();
-	ctx->PSSetShaderResources(0, 1, &psResources);
+	m_effect->Apply(ctx);
 
 	// Draw things
 	ctx->DrawIndexed(m_cubeObject->GetElementCount(), 0, 0);

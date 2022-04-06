@@ -3,11 +3,7 @@
 #include "StepTimer.h"
 #include "DeviceResources.h"
 #include "CubeObject.h"
-
-struct VS_CONSTANT_BUFFER
-{
-	DirectX::XMMATRIX matWorldViewProj;
-};
+#include "MyEffect.h"
 
 class SampleScene
 {
@@ -32,23 +28,15 @@ private:
 
 	std::unique_ptr<DeviceResources> m_deviceResources;
 	std::unique_ptr<CubeObject> m_cubeObject;
+	std::unique_ptr<MyEffect> m_effect;
 
 	std::unique_ptr<DirectX::CommonStates> m_commonStates;
 	std::unique_ptr<DirectX::Keyboard> m_keyboard;
 	std::unique_ptr<DirectX::Mouse> m_mouse;
 	std::unique_ptr<DirectX::GamePad> m_gamepad;
 
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader;
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader;
-
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
-
-	DirectX::ConstantBuffer<VS_CONSTANT_BUFFER> m_constantBuffer;
-
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_cubeTexture;
-
-	DirectX::SimpleMath::Matrix m_view;
-	DirectX::SimpleMath::Matrix m_projection;
 
 	::IUnknown* m_window;
 };

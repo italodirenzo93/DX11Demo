@@ -35,6 +35,7 @@
 // DirectXTK helpers
 #include <BufferHelpers.h>
 #include <CommonStates.h>
+#include <Effects.h>
 #include <GamePad.h>
 #include <Keyboard.h>
 #include <Mouse.h>

@@ -6,8 +6,8 @@ using namespace DirectX::SimpleMath;
 
 Matrix SceneObject::GetWorldMatrix() const noexcept
 {
-	const auto position = Matrix::CreateTranslation(worldPosition);
+	const auto position = Matrix::CreateWorld(worldPosition, Vector3::UnitZ, Vector3::UnitY);
 	const auto rotation = Matrix::CreateFromYawPitchRoll(worldRotation);
 
-	return position * rotation;
+	return rotation * position;
 }
