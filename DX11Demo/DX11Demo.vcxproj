@@ -6,8 +6,8 @@
     <CppWinRTRootNamespaceAutoMerge>true</CppWinRTRootNamespaceAutoMerge>
     <MinimalCoreWin>true</MinimalCoreWin>
     <ProjectGuid>{e4f0abbf-d4a6-40ab-8151-e50bf897080f}</ProjectGuid>
-    <ProjectName>DX11DemoUWP</ProjectName>
-    <RootNamespace>DX11DemoUWP</RootNamespace>
+    <ProjectName>DX11Demo</ProjectName>
+    <RootNamespace>DX11Demo</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <AppContainerApplication>true</AppContainerApplication>
