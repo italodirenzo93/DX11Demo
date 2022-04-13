@@ -8,4 +8,4 @@ This is a little research of mine with the aim of learning how graphics programm
   - "Universal Windows Platform Development" and "Game Development with C++" workloads
 
 # Running on Xbox One / Xbox Series X|S
-As an added benefit from being a UWP, this demo can be deployed and debugged under "Dev Mode" on Xbox One and Xbox Series X|S consoles.
+As an added benefit from being a UWP app, this demo can be deployed and debugged under "Dev Mode" on Xbox One and Xbox Series X|S consoles. Follow [this guide](https://docs.microsoft.com/en-us/windows/uwp/xbox-apps/getting-started) for information on deloying UWP apps to Xbox.
