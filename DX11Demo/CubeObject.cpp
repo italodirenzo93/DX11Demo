@@ -3,15 +3,14 @@
 
 #include <GeometricPrimitive.h>
 
+#include "MyEffect.h"
+
 using namespace DX;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-struct VertexType
-{
-	DirectX::SimpleMath::Vector3 position;
-	DirectX::SimpleMath::Vector2 tex;
-};
+using VertexType = MyEffect::VertexType;
+
 
 CubeObject::CubeObject(ID3D11Device* device)
 	:

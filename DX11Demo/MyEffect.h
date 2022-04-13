@@ -36,6 +36,12 @@ private:
 	DirectX::ConstantBuffer<MyEffectConstants> m_constantBuffer;
 
 public:
+	struct VertexType
+	{
+		DirectX::SimpleMath::Vector3 position;
+		DirectX::SimpleMath::Vector2 tex;
+	};
+
 	static inline constexpr D3D11_INPUT_ELEMENT_DESC InputLayout[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },

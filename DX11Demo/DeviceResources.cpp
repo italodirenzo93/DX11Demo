@@ -96,7 +96,7 @@ void DeviceResources::CreateDeviceResources()
 #endif
 
 	ThrowIfFailed(
-		D3D11CreateDevice(m_adapter.Get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, deviceFlags, requestedFeatureLevels, ARRAYSIZE(requestedFeatureLevels),
+		D3D11CreateDevice(m_adapter.Get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, deviceFlags, requestedFeatureLevels, _countof(requestedFeatureLevels),
 			D3D11_SDK_VERSION, m_device.ReleaseAndGetAddressOf(), &m_featureLevel, m_deviceContext.ReleaseAndGetAddressOf())
 	);
 
@@ -152,6 +152,8 @@ void DeviceResources::CreateWindowSizeDependentResources()
 	m_viewport.TopLeftY = 0;
 	m_viewport.Width = static_cast<float>(m_outputSize.right - m_outputSize.left);
 	m_viewport.Height = static_cast<float>(m_outputSize.bottom - m_outputSize.top);
+	m_viewport.MinDepth = 0.0f;
+	m_viewport.MaxDepth = 1.0f;
 
 	// Resize SwapChain if already exists, otherwise create it
 	if (m_swapChain)
