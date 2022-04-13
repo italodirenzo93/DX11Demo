@@ -148,10 +148,10 @@ void DeviceResources::CreateWindowSizeDependentResources()
 	const auto height = m_outputSize.bottom - m_outputSize.top;
 
 	// Set viewport size
-	m_viewport.x = 0;
-	m_viewport.y = 0;
-	m_viewport.width = static_cast<float>(m_outputSize.right - m_outputSize.left);
-	m_viewport.height = static_cast<float>(m_outputSize.bottom - m_outputSize.top);
+	m_viewport.TopLeftX = 0;
+	m_viewport.TopLeftY = 0;
+	m_viewport.Width = static_cast<float>(m_outputSize.right - m_outputSize.left);
+	m_viewport.Height = static_cast<float>(m_outputSize.bottom - m_outputSize.top);
 
 	// Resize SwapChain if already exists, otherwise create it
 	if (m_swapChain)
@@ -169,8 +169,8 @@ void DeviceResources::CreateWindowSizeDependentResources()
 	{
 		DXGI_SWAP_CHAIN_DESC1 scd = {};
 		scd.BufferCount = 1;
-		scd.Width = static_cast<UINT>(m_viewport.width);
-		scd.Height = static_cast<UINT>(m_viewport.height);
+		scd.Width = static_cast<UINT>(m_viewport.Width);
+		scd.Height = static_cast<UINT>(m_viewport.Height);
 		scd.Format = m_backBufferFormat;
 		scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		scd.SampleDesc.Count = 1;
@@ -216,8 +216,8 @@ void DeviceResources::CreateWindowSizeDependentResources()
 	if (m_depthBufferFormat != DXGI_FORMAT_UNKNOWN)
 	{
 		D3D11_TEXTURE2D_DESC1 depthBufferDesc = {};
-		depthBufferDesc.Width = static_cast<UINT>(m_viewport.width);
-		depthBufferDesc.Height = static_cast<UINT>(m_viewport.height);
+		depthBufferDesc.Width = static_cast<UINT>(m_viewport.Width);
+		depthBufferDesc.Height = static_cast<UINT>(m_viewport.Height);
 		depthBufferDesc.Format = m_depthBufferFormat;
 		depthBufferDesc.MipLevels = 1;
 		depthBufferDesc.ArraySize = 1;

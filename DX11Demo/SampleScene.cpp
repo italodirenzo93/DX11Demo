@@ -110,7 +110,7 @@ void SampleScene::CreateWindowSizeDependentResources()
 {
 	const auto vp = m_deviceResources->GetViewport();
 
-	m_effect->SetProjection( XMMatrixPerspectiveFovLH(XM_PI / 4.f, vp.AspectRatio(), 0.1f, 10.f) );
+	m_effect->SetProjection( XMMatrixPerspectiveFovLH(XM_PI / 4.f, vp.Width / vp.Height, 0.1f, 10.f) );
 	m_effect->SetView( XMMatrixLookAtLH(Vector3(0.0f, 1.0f, -3.0f), Vector3::Zero, Vector3::UnitY) );
 }
 
@@ -129,7 +129,8 @@ void SampleScene::Update(const StepTimer& timer)
 	// Rotate each cube
 	for (auto& obj : m_objects)
 	{
-		obj.worldRotation = Quaternion::CreateFromAxisAngle(Vector3::UnitY, elapsed).ToEuler();
+		const auto rot = Quaternion::CreateFromAxisAngle(Vector3::UnitY, elapsed);
+		obj.SetWorldRotation(rot);
 	}
 }
 
@@ -143,8 +144,9 @@ void SampleScene::Render()
 	ctx->ClearDepthStencilView(m_deviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	// Rasterizer state
-	ctx->RSSetViewports(1, m_deviceResources->GetViewport().Get11());
-	ctx->RSSetState(m_commonStates->CullNone());
+	const auto viewport = m_deviceResources->GetViewport();
+	ctx->RSSetViewports(1, &viewport);
+	ctx->RSSetState(m_commonStates->CullClockwise());
 
 	// Output-merger
 	ctx->OMSetBlendState(m_commonStates->Opaque(), Colors::White, 0xFFFFFFFF);

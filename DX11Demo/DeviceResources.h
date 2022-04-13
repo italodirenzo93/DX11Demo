@@ -20,7 +20,7 @@ public:
 	ID3D11RenderTargetView1* GetRenderTarget() const noexcept { return m_renderTarget.Get(); }
 	ID3D11DepthStencilView* GetDepthStencilView() const noexcept { return m_depthStencilView.Get(); }
 	D3D_FEATURE_LEVEL GetFeatureLevel() const noexcept { return m_featureLevel; }
-	DirectX::SimpleMath::Viewport GetViewport() const noexcept { return m_viewport; }
+	D3D11_VIEWPORT GetViewport() const noexcept { return m_viewport; }
 
 	RECT GetOutputSize() const noexcept { return m_outputSize; }
 
@@ -43,7 +43,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_depthStencilView;
 
 	D3D_FEATURE_LEVEL m_featureLevel;
-	DirectX::SimpleMath::Viewport m_viewport;
+	D3D11_VIEWPORT m_viewport;
 
 	WindowHandle m_window;
 	DXGI_FORMAT m_backBufferFormat;
