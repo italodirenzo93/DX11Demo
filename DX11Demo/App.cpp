@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "SampleScene.h"
 
-#include <winrt/Windows.UI.Popups.h>
-
 using namespace DirectX;
 using namespace winrt;
 using namespace winrt::Windows;

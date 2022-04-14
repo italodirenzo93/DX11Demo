@@ -110,6 +110,7 @@
     <ClInclude Include="DeviceResources.h" />
     <ClInclude Include="MyEffect.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="ReadData.h" />
     <ClInclude Include="SampleScene.h" />
     <ClInclude Include="SceneObject.h" />
@@ -138,6 +139,7 @@
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="PerspectiveCamera.cpp" />
     <ClCompile Include="SampleScene.cpp" />
     <ClCompile Include="SceneObject.cpp" />
   </ItemGroup>

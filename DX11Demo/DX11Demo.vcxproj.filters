@@ -8,6 +8,7 @@
     <ClCompile Include="SceneObject.cpp" />
     <ClCompile Include="CubeObject.cpp" />
     <ClCompile Include="MyEffect.cpp" />
+    <ClCompile Include="PerspectiveCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -18,6 +19,7 @@
     <ClInclude Include="SceneObject.h" />
     <ClInclude Include="CubeObject.h" />
     <ClInclude Include="MyEffect.h" />
+    <ClInclude Include="PerspectiveCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Wide310x150Logo.scale-200.png">
