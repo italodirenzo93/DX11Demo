@@ -108,10 +108,9 @@ void SampleScene::CreateDeviceDependentResources()
 
 void SampleScene::CreateWindowSizeDependentResources()
 {
-	const auto vp = m_deviceResources->GetViewport();
+	m_camera = std::make_unique<PerspectiveCamera>(Viewport(m_deviceResources->GetViewport()));
 
-	m_effect->SetProjection( XMMatrixPerspectiveFovLH(XM_PI / 4.f, vp.Width / vp.Height, 0.1f, 10.f) );
-	m_effect->SetView( XMMatrixLookAtLH(Vector3(0.0f, 1.0f, -3.0f), Vector3::Zero, Vector3::UnitY) );
+	m_camera->SetWorldPosition(Vector3(0.0f, 1.0f, -3.0f));
 }
 
 void SampleScene::Update(const StepTimer& timer)
@@ -166,7 +165,7 @@ void SampleScene::Render()
 		ctx->IASetVertexBuffers(0, 1, &vertexBuffers, &strides, &offsets);
 		ctx->IASetIndexBuffer(obj.GetIndexBuffer(), DXGI_FORMAT_R16_UINT, 0);
 
-		m_effect->SetWorld(obj.GetWorldMatrix());
+		m_effect->SetMatrices(obj.GetWorldMatrix(), m_camera->GetViewMatrix(), m_camera->GetProjectionMatrix());
 		m_effect->Apply(ctx);
 
 		// Draw things
