@@ -4,6 +4,7 @@
 #include "DeviceResources.h"
 #include "CubeObject.h"
 #include "MyEffect.h"
+#include "PerspectiveCamera.h"
 
 class SampleScene
 {
@@ -28,6 +29,7 @@ private:
 
 	std::unique_ptr<DX::DeviceResources> m_deviceResources;
 	std::unique_ptr<DX::MyEffect> m_effect;
+	std::unique_ptr<DX::PerspectiveCamera> m_camera;
 
 	std::vector<DX::CubeObject> m_objects;
 

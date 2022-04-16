@@ -31,10 +31,11 @@ namespace DX
 	{
 		if (m_dirtyWorldMatrix)
 		{
-			const auto translation = XMMatrixTranslationFromVector(m_worldPosition);
-			const auto rotation = XMMatrixRotationQuaternion(m_worldRotation);
+			const auto translation = Matrix::CreateWorld(m_worldPosition, Vector3::Forward, Vector3::Up);
+			//const auto translation = Matrix::CreateWorld(m_worldPosition, m_worldRotation., Vector3::Up);
+			const auto rotation = Matrix::CreateFromQuaternion(m_worldRotation);
 
-			m_worldMatrix = XMMatrixMultiply(rotation, translation);
+			m_worldMatrix = rotation * translation;
 
 			m_dirtyWorldMatrix = false;
 		}

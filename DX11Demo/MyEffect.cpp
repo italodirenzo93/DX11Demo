@@ -31,8 +31,7 @@ namespace DX
 	{
 		if (m_dirtyFlags & DirtyWVPMatrix)
 		{
-			m_worldViewProj = XMMatrixMultiply(XMMatrixMultiply(m_world, m_view), m_proj);
-			//m_worldViewProj = m_world * m_view * m_proj;
+			m_worldViewProj = m_world * m_view * m_proj;
 
 			m_dirtyFlags &= ~DirtyWVPMatrix;
 			m_dirtyFlags |= DirtyConstantBuffer;
