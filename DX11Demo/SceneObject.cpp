@@ -32,11 +32,9 @@ namespace DX
 		if (m_dirtyWorldMatrix)
 		{
 			const auto translation = Matrix::CreateTranslation(m_worldPosition);
-			//const auto translation = Matrix::CreateWorld(m_worldPosition, m_worldRotation., Vector3::Up);
-			const auto rotation = Matrix::CreateFromQuaternion(m_worldRotation);
+			const auto rotation = Matrix::CreateFromYawPitchRoll(m_worldRotation);
 			
 			m_worldMatrix = rotation * translation;
-			//m_worldMatrix = Matrix::CreateWorld(m_worldPosition, rotation.Forward(), rotation.Up());
 
 			m_dirtyWorldMatrix = false;
 		}
@@ -50,7 +48,7 @@ namespace DX
 		m_dirtyWorldMatrix = true;
 	}
 
-	void SceneObject::SetWorldRotation(const Quaternion& rotation) noexcept
+	void SceneObject::SetWorldRotation(const Vector3& rotation) noexcept
 	{
 		m_worldRotation = rotation;
 		m_dirtyWorldMatrix = true;
@@ -59,6 +57,12 @@ namespace DX
 	void SceneObject::Translate(const Vector3& translation) noexcept
 	{
 		m_worldPosition = m_worldPosition + translation;
+		m_dirtyWorldMatrix = true;
+	}
+
+	void SceneObject::Rotate(const Vector3& angles) noexcept
+	{
+		m_worldRotation = m_worldRotation + angles;
 		m_dirtyWorldMatrix = true;
 	}
 }

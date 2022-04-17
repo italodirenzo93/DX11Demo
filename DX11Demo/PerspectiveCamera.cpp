@@ -56,7 +56,7 @@ namespace DX
 		m_dirtyViewMatrix = true;
 	}
 
-	void PerspectiveCamera::SetWorldRotation(const Quaternion& rotation) noexcept
+	void PerspectiveCamera::SetWorldRotation(const Vector3& rotation) noexcept
 	{
 		SceneObject::SetWorldRotation(rotation);
 		m_dirtyViewMatrix = true;
@@ -65,6 +65,12 @@ namespace DX
 	void PerspectiveCamera::Translate(const Vector3& translation) noexcept
 	{
 		SceneObject::Translate(translation);
+		m_dirtyViewMatrix = true;
+	}
+
+	void PerspectiveCamera::Rotate(const Vector3& angles) noexcept
+	{
+		SceneObject::Rotate(angles);
 		m_dirtyViewMatrix = true;
 	}
 }

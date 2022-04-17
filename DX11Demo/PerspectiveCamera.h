@@ -16,9 +16,10 @@ namespace DX
 
 		void SetViewport(const DirectX::SimpleMath::Viewport& viewport) noexcept;
 		virtual void SetWorldPosition(const DirectX::SimpleMath::Vector3& position) noexcept override;
-		virtual void SetWorldRotation(const DirectX::SimpleMath::Quaternion& rotation) noexcept override;
+		virtual void SetWorldRotation(const DirectX::SimpleMath::Vector3& rotation) noexcept override;
 
 		virtual void Translate(const DirectX::SimpleMath::Vector3& translation) noexcept override;
+		virtual void Rotate(const DirectX::SimpleMath::Vector3& angles) noexcept;
 
 	private:
 		DirectX::SimpleMath::Viewport m_viewport;

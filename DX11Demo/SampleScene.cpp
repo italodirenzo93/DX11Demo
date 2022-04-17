@@ -171,8 +171,7 @@ void SampleScene::Update(const StepTimer& timer)
 	// Rotate each cube
 	for (auto& obj : m_objects)
 	{
-		const auto rot = Quaternion::CreateFromAxisAngle(Vector3::UnitY, elapsed);
-		obj.SetWorldRotation(rot);
+		obj.Rotate(Vector3(0.0f, deltaTime, 0.0f));
 	}
 
 	m_lastFrameTime = elapsed;

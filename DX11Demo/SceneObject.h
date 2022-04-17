@@ -11,17 +11,18 @@ namespace DX
 		virtual ~SceneObject() = default;
 
 		DirectX::SimpleMath::Vector3 GetWorldPosition() const noexcept { return m_worldPosition; }
-		DirectX::SimpleMath::Quaternion GetWorldRotation() const noexcept { return m_worldRotation; }
+		DirectX::SimpleMath::Vector3 GetWorldRotation() const noexcept { return m_worldRotation; }
 		virtual DirectX::SimpleMath::Matrix GetWorldMatrix() noexcept;
 
 		virtual void SetWorldPosition(const DirectX::SimpleMath::Vector3& position) noexcept;
-		virtual void SetWorldRotation(const DirectX::SimpleMath::Quaternion& rotation) noexcept;
+		virtual void SetWorldRotation(const DirectX::SimpleMath::Vector3& rotation) noexcept;
 
 		virtual void Translate(const DirectX::SimpleMath::Vector3& translation) noexcept;
+		virtual void Rotate(const DirectX::SimpleMath::Vector3& angles) noexcept;
 
 	protected:
 		DirectX::SimpleMath::Vector3 m_worldPosition;
-		DirectX::SimpleMath::Quaternion m_worldRotation;
+		DirectX::SimpleMath::Vector3 m_worldRotation;
 
 		DirectX::SimpleMath::Matrix m_worldMatrix;
 		bool m_dirtyWorldMatrix;
