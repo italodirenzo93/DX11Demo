@@ -9,10 +9,16 @@ namespace DX
 	public:
 		explicit PerspectiveCamera(const DirectX::SimpleMath::Viewport& viewport) noexcept;
 
+		DirectX::SimpleMath::Viewport GetViewport() const noexcept { return m_viewport; }
 		DirectX::SimpleMath::Matrix GetProjectionMatrix() noexcept;
 		DirectX::SimpleMath::Matrix GetViewMatrix() noexcept;
+		DirectX::SimpleMath::Matrix GetWorldMatrix() noexcept override;
 
 		void SetViewport(const DirectX::SimpleMath::Viewport& viewport) noexcept;
+		virtual void SetWorldPosition(const DirectX::SimpleMath::Vector3& position) noexcept override;
+		virtual void SetWorldRotation(const DirectX::SimpleMath::Quaternion& rotation) noexcept override;
+
+		virtual void Translate(const DirectX::SimpleMath::Vector3& translation) noexcept override;
 
 	private:
 		DirectX::SimpleMath::Viewport m_viewport;

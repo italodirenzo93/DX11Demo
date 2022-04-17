@@ -12,7 +12,11 @@ using Microsoft::WRL::ComPtr;
 
 extern void ExitApplication() noexcept;
 
+static constexpr float CameraSpeed = 7.0f;
+
 SampleScene::SampleScene()
+	:
+	m_lastFrameTime(0.0f)
 {
 	m_deviceResources = std::make_unique<DeviceResources>();
 	m_keyboard = std::make_unique<Keyboard>();
@@ -108,15 +112,14 @@ void SampleScene::CreateDeviceDependentResources()
 
 void SampleScene::CreateWindowSizeDependentResources()
 {
-	const auto vp = m_deviceResources->GetViewport();
-
-	m_effect->SetProjection( XMMatrixPerspectiveFovLH(XM_PI / 4.f, vp.Width / vp.Height, 0.1f, 10.f) );
-	m_effect->SetView( XMMatrixLookAtLH(Vector3(0.0f, 1.0f, -3.0f), Vector3::Zero, Vector3::UnitY) );
+	m_camera = std::make_unique<PerspectiveCamera>(Viewport(m_deviceResources->GetViewport()));
+	m_camera->SetWorldPosition(Vector3(0.0f, 0.0f, -3.0f));
 }
 
 void SampleScene::Update(const StepTimer& timer)
 {
 	const auto keyboard = m_keyboard->GetState();
+	//const auto mouse = m_mouse->GetState();
 	const auto gamepad = m_gamepad->GetState(0);
 
 	if (keyboard.Escape || gamepad.IsBPressed())
@@ -125,6 +128,45 @@ void SampleScene::Update(const StepTimer& timer)
 	}
 
 	const float elapsed = float(timer.GetTotalSeconds());
+	const float deltaTime = elapsed - m_lastFrameTime;
+	
+	// Camera controls (keyboard)
+	if (keyboard.A)
+	{
+		m_camera->Translate(-Vector3::UnitX * CameraSpeed * deltaTime);
+	}
+	if (keyboard.D)
+	{
+		m_camera->Translate(Vector3::UnitX * CameraSpeed * deltaTime);
+	}
+	if (keyboard.W)
+	{
+		m_camera->Translate(Vector3::UnitZ * CameraSpeed * deltaTime);
+	}
+	if (keyboard.S)
+	{
+		m_camera->Translate(-Vector3::UnitZ * CameraSpeed * deltaTime);
+	}
+	if (keyboard.Q)
+	{
+		m_camera->Translate(Vector3::UnitY * CameraSpeed * deltaTime);
+	}
+	if (keyboard.E)
+	{
+		m_camera->Translate(-Vector3::UnitY * CameraSpeed * deltaTime);
+	}
+
+	// Camera controls (gamepad)
+	if (gamepad.IsConnected())
+	{
+		m_camera->Translate(
+			Vector3(
+				gamepad.thumbSticks.leftX * CameraSpeed * deltaTime,
+				0.0f,
+				gamepad.thumbSticks.leftY * CameraSpeed * deltaTime
+			)
+		);
+	}
 
 	// Rotate each cube
 	for (auto& obj : m_objects)
@@ -132,6 +174,8 @@ void SampleScene::Update(const StepTimer& timer)
 		const auto rot = Quaternion::CreateFromAxisAngle(Vector3::UnitY, elapsed);
 		obj.SetWorldRotation(rot);
 	}
+
+	m_lastFrameTime = elapsed;
 }
 
 void SampleScene::Render()
@@ -166,7 +210,7 @@ void SampleScene::Render()
 		ctx->IASetVertexBuffers(0, 1, &vertexBuffers, &strides, &offsets);
 		ctx->IASetIndexBuffer(obj.GetIndexBuffer(), DXGI_FORMAT_R16_UINT, 0);
 
-		m_effect->SetWorld(obj.GetWorldMatrix());
+		m_effect->SetMatrices(obj.GetWorldMatrix(), m_camera->GetViewMatrix(), m_camera->GetProjectionMatrix());
 		m_effect->Apply(ctx);
 
 		// Draw things

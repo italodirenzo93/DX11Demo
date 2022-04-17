@@ -26,6 +26,7 @@ private:
 	void Render();
 
 	DX::StepTimer m_timer;
+	float m_lastFrameTime;
 
 	std::unique_ptr<DX::DeviceResources> m_deviceResources;
 	std::unique_ptr<DX::MyEffect> m_effect;

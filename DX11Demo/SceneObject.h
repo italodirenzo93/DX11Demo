@@ -12,18 +12,18 @@ namespace DX
 
 		DirectX::SimpleMath::Vector3 GetWorldPosition() const noexcept { return m_worldPosition; }
 		DirectX::SimpleMath::Quaternion GetWorldRotation() const noexcept { return m_worldRotation; }
-		DirectX::SimpleMath::Matrix GetWorldMatrix() noexcept;
+		virtual DirectX::SimpleMath::Matrix GetWorldMatrix() noexcept;
 
-		void SetWorldPosition(const DirectX::SimpleMath::Vector3& position) noexcept;
-		void SetWorldRotation(const DirectX::SimpleMath::Quaternion& rotation) noexcept;
+		virtual void SetWorldPosition(const DirectX::SimpleMath::Vector3& position) noexcept;
+		virtual void SetWorldRotation(const DirectX::SimpleMath::Quaternion& rotation) noexcept;
+
+		virtual void Translate(const DirectX::SimpleMath::Vector3& translation) noexcept;
 
 	protected:
 		DirectX::SimpleMath::Vector3 m_worldPosition;
 		DirectX::SimpleMath::Quaternion m_worldRotation;
 
 		DirectX::SimpleMath::Matrix m_worldMatrix;
-
-	private:
 		bool m_dirtyWorldMatrix;
 	};
 }
