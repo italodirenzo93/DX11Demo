@@ -40,6 +40,13 @@ void SampleScene::Initialize(const winrt::Windows::UI::Core::CoreWindow& window,
 
 	m_keyboard->SetWindow(window);
 	m_mouse->SetWindow(window);
+
+	// This is gross, move this into App.cpp somehow...
+	auto di = winrt::Windows::Graphics::Display::DisplayInformation::GetForCurrentView();
+	m_mouse->SetDpi(di.LogicalDpi());
+
+	m_mouse->SetVisible(false);
+	m_mouse->SetMode(Mouse::MODE_RELATIVE);
 }
 
 void SampleScene::OnWindowSizeChanged(int width, int height)
@@ -108,6 +115,9 @@ void SampleScene::CreateDeviceDependentResources()
 
 		m_effect->SetTexture(m_cubeTexture.Get());
 	}
+
+	m_spriteBatch = std::make_unique<SpriteBatch>(m_deviceResources->GetDeviceContext());
+	m_spriteFont = std::make_unique<SpriteFont>(device, L"Assets/consolas.spritefont");
 }
 
 void SampleScene::CreateWindowSizeDependentResources()
@@ -119,7 +129,6 @@ void SampleScene::CreateWindowSizeDependentResources()
 void SampleScene::Update(const StepTimer& timer)
 {
 	const auto keyboard = m_keyboard->GetState();
-	//const auto mouse = m_mouse->GetState();
 	const auto gamepad = m_gamepad->GetState(0);
 
 	if (keyboard.Escape || gamepad.IsBPressed())
@@ -154,6 +163,14 @@ void SampleScene::Update(const StepTimer& timer)
 	if (keyboard.E)
 	{
 		m_camera->Translate(-Vector3::UnitY * CameraSpeed * deltaTime);
+	}
+
+	// mouse look
+	if (m_mouse->IsConnected())
+	{
+		const auto mouse = m_mouse->GetState();
+
+		m_camera->Rotate(Vector3(float(mouse.x), float(-mouse.y), 0.0f) * deltaTime);
 	}
 
 	// Camera controls (gamepad)
@@ -215,6 +232,16 @@ void SampleScene::Render()
 		// Draw things
 		ctx->DrawIndexed(obj.GetElementCount(), 0, 0);
 	}
+	
+	// Draw UI text
+	m_spriteBatch->Begin();
+	
+	sprintf_s(fpsText, "%d FPS", m_timer.GetFramesPerSecond());
+	//sprintf_s(fpsText, "X: %d, Y: %d", int(m_mousePos.x), int(m_mousePos.y));
+
+	m_spriteFont->DrawString(m_spriteBatch.get(), fpsText, Vector3::Zero);
+
+	m_spriteBatch->End();
 
 	// Show the back buffer
 	m_deviceResources->GetSwapChain()->Present(1, 0);

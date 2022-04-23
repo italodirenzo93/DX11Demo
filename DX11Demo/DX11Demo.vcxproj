@@ -144,6 +144,9 @@
     <ClCompile Include="SceneObject.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\consolas.spritefont">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="common.hlsli" />
     <None Include="packages.config" />
     <None Include="PropertySheet.props" />

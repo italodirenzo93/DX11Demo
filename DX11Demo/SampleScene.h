@@ -39,6 +39,10 @@ private:
 	std::unique_ptr<DirectX::Mouse> m_mouse;
 	std::unique_ptr<DirectX::GamePad> m_gamepad;
 
+	std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
+	std::unique_ptr<DirectX::SpriteFont> m_spriteFont;
+	char fpsText[48];
+
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_cubeTexture;
 

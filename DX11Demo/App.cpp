@@ -10,6 +10,7 @@ using namespace winrt::Windows::Foundation::Numerics;
 using namespace winrt::Windows::UI;
 using namespace winrt::Windows::UI::Core;
 using namespace winrt::Windows::UI::Composition;
+using namespace winrt::Windows::Graphics::Display;
 
 struct App : implements<App, IFrameworkViewSource, IFrameworkView>
 {
@@ -68,6 +69,9 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView>
         window.Closed([this](auto&&, auto&&) { m_exit = true; });
         window.SizeChanged({ this, &App::OnWindowSizeChanged });
 
+        auto currentDisplayInformation = DisplayInformation::GetForCurrentView();
+        currentDisplayInformation.DpiChanged({ this, &App::OnDpiChanged });
+
         m_scene->Initialize(window, int(window.Bounds().Width), int(window.Bounds().Height));
     }
 
@@ -81,6 +85,11 @@ protected:
     void OnWindowSizeChanged(CoreWindow const& sender, WindowSizeChangedEventArgs const& /*args*/)
     {
         m_scene->OnWindowSizeChanged(int(sender.Bounds().Width), int(sender.Bounds().Height));
+    }
+
+    void OnDpiChanged(DisplayInformation const& sender, IInspectable const& /*args*/)
+    {
+        Mouse::SetDpi(sender.LogicalDpi());
     }
 
 private:

@@ -59,6 +59,9 @@
     <None Include="PropertySheet.props" />
     <None Include="packages.config" />
     <None Include="common.hlsli" />
+    <None Include="Assets\consolas.spritefont">
+      <Filter>Assets</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
