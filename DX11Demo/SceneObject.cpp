@@ -14,11 +14,11 @@ namespace DX
 
 	SceneObject::SceneObject(const Vector3& position) noexcept
 		:
-		SceneObject(position, Quaternion::Identity)
+		SceneObject(position, Vector3::Zero)
 	{
 	}
 
-	SceneObject::SceneObject(const Vector3& position, const Quaternion& rotation) noexcept
+	SceneObject::SceneObject(const Vector3& position, const Vector3& rotation) noexcept
 		:
 		m_worldPosition(position),
 		m_worldRotation(rotation),

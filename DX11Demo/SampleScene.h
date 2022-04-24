@@ -43,8 +43,8 @@ private:
 	std::unique_ptr<DirectX::SpriteFont> m_spriteFont;
 	char fpsText[48];
 
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_cubeTexture;
+	winrt::com_ptr<ID3D11InputLayout> m_inputLayout;
+	winrt::com_ptr<ID3D11ShaderResourceView> m_cubeTexture;
 
 	::IUnknown* m_window;
 };

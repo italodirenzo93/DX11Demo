@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "DeviceResources.h"
 
-using Microsoft::WRL::ComPtr;
-
 namespace DX
 {
 	DeviceResources::DeviceResources(DXGI_FORMAT backBufferFormat, DXGI_FORMAT depthBufferFormat)
@@ -22,37 +20,27 @@ namespace DX
 
 	ID3D11Device5* DeviceResources::GetDevice() const noexcept
 	{
-		ComPtr<ID3D11Device5> device;
-		m_device.As(&device);
-		return device.Get();
+		return m_device.as<ID3D11Device5>().get();
 	}
 
 	ID3D11DeviceContext4* DeviceResources::GetDeviceContext() const noexcept
 	{
-		ComPtr<ID3D11DeviceContext4> deviceContext;
-		m_deviceContext.As(&deviceContext);
-		return deviceContext.Get();
+		return m_deviceContext.as<ID3D11DeviceContext4>().get();
 	}
 
 	IDXGISwapChain4* DeviceResources::GetSwapChain() const noexcept
 	{
-		ComPtr<IDXGISwapChain4> swapChain;
-		m_swapChain.As(&swapChain);
-		return swapChain.Get();
+		return m_swapChain.as<IDXGISwapChain4>().get();
 	}
 
 	IDXGIAdapter4* DeviceResources::GetAdapter() const noexcept
 	{
-		ComPtr<IDXGIAdapter4> dxgiAdapter;
-		m_adapter.As(&dxgiAdapter);
-		return dxgiAdapter.Get();
+		return m_adapter.as<IDXGIAdapter4>().get();
 	}
 
 	IDXGIFactory5* DeviceResources::GetFactory() const noexcept
 	{
-		ComPtr<IDXGIFactory5> dxgiFactory;
-		m_dxgiFactory.As(&dxgiFactory);
-		return dxgiFactory.Get();
+		return m_dxgiFactory.as<IDXGIFactory5>().get();
 	}
 
 	void DeviceResources::SetWindow(WindowHandle window, int width, int height) noexcept
@@ -78,7 +66,7 @@ namespace DX
 		);
 
 		ThrowIfFailed(
-			m_dxgiFactory->EnumAdapters1(0, m_adapter.ReleaseAndGetAddressOf())
+			m_dxgiFactory->EnumAdapters1(0, m_adapter.put())
 		);
 
 		static const D3D_FEATURE_LEVEL requestedFeatureLevels[] = {
@@ -97,17 +85,13 @@ namespace DX
 #endif
 
 		ThrowIfFailed(
-			D3D11CreateDevice(m_adapter.Get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, deviceFlags, requestedFeatureLevels, _countof(requestedFeatureLevels),
-				D3D11_SDK_VERSION, m_device.ReleaseAndGetAddressOf(), &m_featureLevel, m_deviceContext.ReleaseAndGetAddressOf())
+			D3D11CreateDevice(m_adapter.get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, deviceFlags, requestedFeatureLevels, _countof(requestedFeatureLevels),
+				D3D11_SDK_VERSION, m_device.put(), &m_featureLevel, m_deviceContext.put())
 		);
 
 		// Initialize debug layer
 		{
-			ComPtr<ID3D11Debug> debug;
-			ComPtr<ID3D11InfoQueue> infoQueue;
-
-			m_device.As(&debug);
-			debug.As(&infoQueue);
+			auto infoQueue = m_device.as<ID3D11Debug>().as<ID3D11InfoQueue>();
 
 #ifdef _DEBUG
 			infoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
@@ -160,9 +144,9 @@ namespace DX
 		if (m_swapChain)
 		{
 			// Release swap chain resources
-			m_depthBuffer.Reset();
-			m_backBuffer.Reset();
-			m_renderTarget.Reset();
+			m_depthBuffer.put();
+			m_backBuffer.put();
+			m_renderTarget.put();
 
 			ThrowIfFailed(
 				m_swapChain->ResizeBuffers(0, width, height, m_backBufferFormat, 0)
@@ -182,19 +166,18 @@ namespace DX
 			scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 			scd.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
 
-			ComPtr<IDXGIDevice4> device4;
-			m_device.As(&device4);
+			auto dxgiDevice = m_device.as<IDXGIDevice4>();
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_PC_APP)
 			scd.BufferCount = 2;
 			scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 			ThrowIfFailed(
-				m_dxgiFactory->CreateSwapChainForCoreWindow(device4.Get(), m_window, &scd, nullptr, m_swapChain.ReleaseAndGetAddressOf())
+				m_dxgiFactory->CreateSwapChainForCoreWindow(dxgiDevice.get(), m_window, &scd, nullptr, m_swapChain.put())
 			);
 #else
 			ThrowIfFailed(
-				m_dxgiFactory->CreateSwapChainForHwnd(device4.Get(), m_window, &scd, nullptr, nullptr, m_swapChain.ReleaseAndGetAddressOf())
+				m_dxgiFactory->CreateSwapChainForHwnd(dxgiDevice.get(), m_window, &scd, nullptr, nullptr, m_swapChain.put())
 			);
 
 			ThrowIfFailed(m_dxgiFactory->MakeWindowAssociation(m_hwnd, DXGI_MWA_NO_ALT_ENTER));
@@ -203,7 +186,7 @@ namespace DX
 
 		// Get a reference to the back buffer
 		ThrowIfFailed(
-			m_swapChain->GetBuffer(0, IID_PPV_ARGS(m_backBuffer.ReleaseAndGetAddressOf()))
+			m_swapChain->GetBuffer(0, IID_PPV_ARGS(m_backBuffer.put()))
 		);
 
 		// Create render target view
@@ -211,7 +194,7 @@ namespace DX
 			CD3D11_RENDER_TARGET_VIEW_DESC1 rd(D3D11_RTV_DIMENSION_TEXTURE2D, m_backBufferFormat);
 
 			ThrowIfFailed(
-				GetDevice()->CreateRenderTargetView1(m_backBuffer.Get(), &rd, m_renderTarget.ReleaseAndGetAddressOf())
+				GetDevice()->CreateRenderTargetView1(m_backBuffer.get(), &rd, m_renderTarget.put())
 			);
 		}
 
@@ -231,7 +214,7 @@ namespace DX
 			depthBufferDesc.CPUAccessFlags = 0;
 			depthBufferDesc.MiscFlags = 0;
 
-			ThrowIfFailed(GetDevice()->CreateTexture2D1(&depthBufferDesc, nullptr, m_depthBuffer.ReleaseAndGetAddressOf()));
+			ThrowIfFailed(GetDevice()->CreateTexture2D1(&depthBufferDesc, nullptr, m_depthBuffer.put()));
 
 			D3D11_DEPTH_STENCIL_VIEW_DESC dsv = {};
 			dsv.Texture2D.MipSlice = 0;
@@ -239,7 +222,7 @@ namespace DX
 			dsv.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 
 			ThrowIfFailed(
-				m_device->CreateDepthStencilView(m_depthBuffer.Get(), &dsv, m_depthStencilView.ReleaseAndGetAddressOf())
+				m_device->CreateDepthStencilView(m_depthBuffer.get(), &dsv, m_depthStencilView.put())
 			);
 		}
 	}

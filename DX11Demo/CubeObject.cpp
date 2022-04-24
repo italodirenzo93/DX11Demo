@@ -37,11 +37,11 @@ namespace DX
 		}
 
 		ThrowIfFailed(
-			CreateStaticBuffer(device, newVerts, D3D11_BIND_VERTEX_BUFFER, m_vertexBuffer.ReleaseAndGetAddressOf())
+			CreateStaticBuffer(device, newVerts, D3D11_BIND_VERTEX_BUFFER, m_vertexBuffer.put())
 		);
 
 		ThrowIfFailed(
-			CreateStaticBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, m_indexBuffer.ReleaseAndGetAddressOf())
+			CreateStaticBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, m_indexBuffer.put())
 		);
 
 		m_numElements = static_cast<UINT>(indices.size());

@@ -20,11 +20,13 @@ namespace DX
 	{
 		m_vsBlob = ReadData(L"VertexShader.cso");
 
-		ThrowIfFailed(device->CreateVertexShader(m_vsBlob.data(), m_vsBlob.size(), nullptr, m_vs.ReleaseAndGetAddressOf()));
+		ThrowIfFailed(device->CreateVertexShader(m_vsBlob.data(), m_vsBlob.size(), nullptr, m_vs.put()));
 
 		auto psBlob = ReadData(L"PixelShader.cso");
 
-		ThrowIfFailed(device->CreatePixelShader(psBlob.data(), psBlob.size(), nullptr, m_ps.ReleaseAndGetAddressOf()));
+		ThrowIfFailed(device->CreatePixelShader(psBlob.data(), psBlob.size(), nullptr, m_ps.put()));
+
+		m_commonStates = std::make_unique<CommonStates>(device);
 	}
 
 	void MyEffect::Apply(ID3D11DeviceContext* deviceContext)
@@ -49,10 +51,15 @@ namespace DX
 
 		const auto cb = m_constantBuffer.GetBuffer();
 		deviceContext->VSSetConstantBuffers(0, 1, &cb);
-		deviceContext->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
 
-		deviceContext->VSSetShader(m_vs.Get(), nullptr, 0);
-		deviceContext->PSSetShader(m_ps.Get(), nullptr, 0);
+		const auto sr = m_texture.get();
+		deviceContext->PSSetShaderResources(0, 1, &sr);
+
+		const auto samplers = m_commonStates->PointClamp();
+		deviceContext->PSSetSamplers(0, 1, &samplers);
+
+		deviceContext->VSSetShader(m_vs.get(), nullptr, 0);
+		deviceContext->PSSetShader(m_ps.get(), nullptr, 0);
 	}
 
 	void MyEffect::GetVertexShaderBytecode(void const** pShaderBytecode, size_t* pBytecodeLength)
@@ -90,6 +97,6 @@ namespace DX
 
 	void MyEffect::SetTexture(ID3D11ShaderResourceView* texture)
 	{
-		m_texture = texture;
+		m_texture.attach(texture);
 	}
 }

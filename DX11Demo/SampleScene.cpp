@@ -8,7 +8,7 @@
 using namespace DX;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
-using Microsoft::WRL::ComPtr;
+using winrt::com_ptr;
 
 extern void ExitApplication() noexcept;
 
@@ -96,7 +96,7 @@ void SampleScene::CreateDeviceDependentResources()
 				MyEffect::InputLayoutCount,
 				bytecodeData,
 				bytecodeLength,
-				m_inputLayout.ReleaseAndGetAddressOf()
+				m_inputLayout.put()
 			)
 		);
 	}
@@ -109,11 +109,11 @@ void SampleScene::CreateDeviceDependentResources()
 				m_deviceResources->GetDeviceContext(),
 				L"Assets/braynzar.dds",
 				nullptr,
-				m_cubeTexture.ReleaseAndGetAddressOf()
+				m_cubeTexture.put()
 			)
 		);
 
-		m_effect->SetTexture(m_cubeTexture.Get());
+		m_effect->SetTexture(m_cubeTexture.get());
 	}
 
 	m_spriteBatch = std::make_unique<SpriteBatch>(m_deviceResources->GetDeviceContext());
@@ -215,7 +215,7 @@ void SampleScene::Render()
 
 	// Input assembler
 	ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	ctx->IASetInputLayout(m_inputLayout.Get());
+	ctx->IASetInputLayout(m_inputLayout.get());
 
 	// Draw each cube
 	for (auto& obj : m_objects)

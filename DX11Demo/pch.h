@@ -9,9 +9,6 @@
 #include <winrt/Windows.UI.Composition.h>
 #include <winrt/Windows.UI.Input.h>
 
-// for ComPtr<T>
-#include <wrl/client.h>
-
 // DirectX headers
 #include <d3d11_4.h>
 #pragma comment (lib, "d3d11.lib")

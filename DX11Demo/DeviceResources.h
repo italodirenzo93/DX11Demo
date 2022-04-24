@@ -19,8 +19,8 @@ namespace DX
 		IDXGISwapChain4* GetSwapChain() const noexcept;
 		IDXGIAdapter4* GetAdapter() const noexcept;
 		IDXGIFactory5* GetFactory() const noexcept;
-		ID3D11RenderTargetView1* GetRenderTarget() const noexcept { return m_renderTarget.Get(); }
-		ID3D11DepthStencilView* GetDepthStencilView() const noexcept { return m_depthStencilView.Get(); }
+		ID3D11RenderTargetView1* GetRenderTarget() const noexcept { return m_renderTarget.get(); }
+		ID3D11DepthStencilView* GetDepthStencilView() const noexcept { return m_depthStencilView.get(); }
 		D3D_FEATURE_LEVEL GetFeatureLevel() const noexcept { return m_featureLevel; }
 		D3D11_VIEWPORT GetViewport() const noexcept { return m_viewport; }
 
@@ -31,18 +31,18 @@ namespace DX
 		void SetWindow(WindowHandle window, int width, int height) noexcept;
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D11Device> m_device;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
+		winrt::com_ptr<ID3D11Device> m_device;
+		winrt::com_ptr<ID3D11DeviceContext> m_deviceContext;
 
-		Microsoft::WRL::ComPtr<IDXGIFactory2> m_dxgiFactory;
-		Microsoft::WRL::ComPtr<IDXGIAdapter1> m_adapter;
-		Microsoft::WRL::ComPtr<IDXGISwapChain1> m_swapChain;
+		winrt::com_ptr<IDXGIFactory2> m_dxgiFactory;
+		winrt::com_ptr<IDXGIAdapter1> m_adapter;
+		winrt::com_ptr<IDXGISwapChain1> m_swapChain;
 
-		Microsoft::WRL::ComPtr<ID3D11Texture2D1> m_backBuffer;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D1> m_depthBuffer;
+		winrt::com_ptr<ID3D11Texture2D1> m_backBuffer;
+		winrt::com_ptr<ID3D11Texture2D1> m_depthBuffer;
 
-		Microsoft::WRL::ComPtr<ID3D11RenderTargetView1> m_renderTarget;
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_depthStencilView;
+		winrt::com_ptr<ID3D11RenderTargetView1> m_renderTarget;
+		winrt::com_ptr<ID3D11DepthStencilView> m_depthStencilView;
 
 		D3D_FEATURE_LEVEL m_featureLevel;
 		D3D11_VIEWPORT m_viewport;

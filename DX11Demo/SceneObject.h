@@ -7,7 +7,7 @@ namespace DX
 	public:
 		SceneObject() noexcept;
 		SceneObject(const DirectX::SimpleMath::Vector3& position) noexcept;
-		SceneObject(const DirectX::SimpleMath::Vector3& position, const DirectX::SimpleMath::Quaternion& rotation) noexcept;
+		SceneObject(const DirectX::SimpleMath::Vector3& position, const DirectX::SimpleMath::Vector3& rotation) noexcept;
 		virtual ~SceneObject() = default;
 
 		DirectX::SimpleMath::Vector3 GetWorldPosition() const noexcept { return m_worldPosition; }

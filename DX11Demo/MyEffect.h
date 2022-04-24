@@ -18,9 +18,9 @@ namespace DX
 		void SetTexture(ID3D11ShaderResourceView* texture);
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vs;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_ps;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;
+		winrt::com_ptr<ID3D11VertexShader> m_vs;
+		winrt::com_ptr<ID3D11PixelShader> m_ps;
+		winrt::com_ptr<ID3D11ShaderResourceView> m_texture;
 		std::vector<uint8_t> m_vsBlob;
 
 		DirectX::SimpleMath::Matrix m_world;
@@ -35,6 +35,7 @@ namespace DX
 			DirectX::XMMATRIX worldViewProj;
 		};
 
+		std::unique_ptr<DirectX::CommonStates> m_commonStates;
 		DirectX::ConstantBuffer<MyEffectConstants> m_constantBuffer;
 
 	public:
