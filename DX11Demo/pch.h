@@ -11,10 +11,9 @@
 
 // DirectX headers
 #include <d3d11_4.h>
-#pragma comment (lib, "d3d11.lib")
-
 #include <dxgi1_6.h>
-#pragma comment (lib, "dxgi.lib")
+#include <d2d1_1.h>
+#include <dwrite_3.h>
 
 #ifdef _DEBUG
 #include <dxgidebug.h>
@@ -38,8 +37,6 @@
 #include <Keyboard.h>
 #include <Mouse.h>
 #include <SimpleMath.h>
-#include <SpriteBatch.h>
-#include <SpriteFont.h>
 #include <VertexTypes.h>
 
 namespace DX

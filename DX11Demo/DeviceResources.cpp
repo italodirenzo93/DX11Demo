@@ -18,14 +18,14 @@ namespace DX
 	{
 	}
 
-	ID3D11Device5* DeviceResources::GetDevice() const noexcept
+	ID3D11Device5* DeviceResources::GetD3DDevice() const noexcept
 	{
-		return m_device.as<ID3D11Device5>().get();
+		return m_d3dDevice.as<ID3D11Device5>().get();
 	}
 
-	ID3D11DeviceContext4* DeviceResources::GetDeviceContext() const noexcept
+	ID3D11DeviceContext4* DeviceResources::GetD3DDeviceContext() const noexcept
 	{
-		return m_deviceContext.as<ID3D11DeviceContext4>().get();
+		return m_d3dDeviceContext.as<ID3D11DeviceContext4>().get();
 	}
 
 	IDXGISwapChain4* DeviceResources::GetSwapChain() const noexcept
@@ -33,14 +33,14 @@ namespace DX
 		return m_swapChain.as<IDXGISwapChain4>().get();
 	}
 
-	IDXGIAdapter4* DeviceResources::GetAdapter() const noexcept
+	IDXGIAdapter4* DeviceResources::GetDXGIAdapter() const noexcept
 	{
 		return m_adapter.as<IDXGIAdapter4>().get();
 	}
 
-	IDXGIFactory5* DeviceResources::GetFactory() const noexcept
+	IDXGIFactory7* DeviceResources::GetDXGIFactory() const noexcept
 	{
-		return m_dxgiFactory.as<IDXGIFactory5>().get();
+		return m_dxgiFactory.as<IDXGIFactory7>().get();
 	}
 
 	void DeviceResources::SetWindow(WindowHandle window, int width, int height) noexcept
@@ -79,19 +79,19 @@ namespace DX
 			D3D_FEATURE_LEVEL_9_1
 		};
 
-		UINT deviceFlags = 0;
+		UINT deviceFlags = D3D11_CREATE_DEVICE_SINGLETHREADED | D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #ifdef _DEBUG
-		deviceFlags = D3D11_CREATE_DEVICE_DEBUG;
+		deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
 		ThrowIfFailed(
 			D3D11CreateDevice(m_adapter.get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, deviceFlags, requestedFeatureLevels, _countof(requestedFeatureLevels),
-				D3D11_SDK_VERSION, m_device.put(), &m_featureLevel, m_deviceContext.put())
+				D3D11_SDK_VERSION, m_d3dDevice.put(), &m_featureLevel, m_d3dDeviceContext.put())
 		);
 
 		// Initialize debug layer
 		{
-			auto infoQueue = m_device.as<ID3D11Debug>().as<ID3D11InfoQueue>();
+			auto infoQueue = m_d3dDevice.as<ID3D11Debug>().as<ID3D11InfoQueue>();
 
 #ifdef _DEBUG
 			infoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
@@ -116,6 +116,30 @@ namespace DX
 		//		debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_FLAGS(DXGI_DEBUG_RLO_SUMMARY | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
 		//	}
 		//#endif
+
+		
+		// Initialize Direct2D
+		{
+#ifdef _DEBUG
+			D2D1_FACTORY_OPTIONS options = {};
+			options.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
+
+			ThrowIfFailed(
+				D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, options, m_d2dFactory.put())
+			);
+#else
+			ThrowIfFailed(
+				D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, m_d2dFactory.put())
+			);
+#endif
+		}
+
+		// Initialize DirectWrite
+		{
+			ThrowIfFailed(
+				DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory7), reinterpret_cast<IUnknown**>(m_dWriteFactory.put()))
+			);
+		}
 	}
 
 	void DeviceResources::CreateWindowSizeDependentResources()
@@ -147,6 +171,7 @@ namespace DX
 			m_depthBuffer.put();
 			m_backBuffer.put();
 			m_renderTarget.put();
+			m_d2dRenderTarget.put();
 
 			ThrowIfFailed(
 				m_swapChain->ResizeBuffers(0, width, height, m_backBufferFormat, 0)
@@ -166,7 +191,7 @@ namespace DX
 			scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 			scd.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
 
-			auto dxgiDevice = m_device.as<IDXGIDevice4>();
+			auto dxgiDevice = m_d3dDevice.as<IDXGIDevice4>();
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_PC_APP)
 			scd.BufferCount = 2;
@@ -194,7 +219,7 @@ namespace DX
 			CD3D11_RENDER_TARGET_VIEW_DESC1 rd(D3D11_RTV_DIMENSION_TEXTURE2D, m_backBufferFormat);
 
 			ThrowIfFailed(
-				GetDevice()->CreateRenderTargetView1(m_backBuffer.get(), &rd, m_renderTarget.put())
+				GetD3DDevice()->CreateRenderTargetView1(m_backBuffer.get(), &rd, m_renderTarget.put())
 			);
 		}
 
@@ -214,7 +239,7 @@ namespace DX
 			depthBufferDesc.CPUAccessFlags = 0;
 			depthBufferDesc.MiscFlags = 0;
 
-			ThrowIfFailed(GetDevice()->CreateTexture2D1(&depthBufferDesc, nullptr, m_depthBuffer.put()));
+			ThrowIfFailed(GetD3DDevice()->CreateTexture2D1(&depthBufferDesc, nullptr, m_depthBuffer.put()));
 
 			D3D11_DEPTH_STENCIL_VIEW_DESC dsv = {};
 			dsv.Texture2D.MipSlice = 0;
@@ -222,7 +247,24 @@ namespace DX
 			dsv.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 
 			ThrowIfFailed(
-				m_device->CreateDepthStencilView(m_depthBuffer.get(), &dsv, m_depthStencilView.put())
+				m_d3dDevice->CreateDepthStencilView(m_depthBuffer.get(), &dsv, m_depthStencilView.put())
+			);
+		}
+
+		// Direct2D render target
+		{
+			winrt::com_ptr<IDXGISurface> pSurface;
+
+			ThrowIfFailed(
+				m_swapChain->GetBuffer(0, IID_PPV_ARGS(pSurface.put()))
+			);
+
+			D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
+				D2D1_RENDER_TARGET_TYPE_DEFAULT,
+				D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED));
+
+			ThrowIfFailed(
+				m_d2dFactory->CreateDxgiSurfaceRenderTarget(pSurface.get(), props, m_d2dRenderTarget.put())
 			);
 		}
 	}

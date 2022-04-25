@@ -14,12 +14,15 @@ namespace DX
 		using WindowHandle = HWND;
 #endif
 
-		ID3D11Device5* GetDevice() const noexcept;
-		ID3D11DeviceContext4* GetDeviceContext() const noexcept;
+		ID3D11Device5* GetD3DDevice() const noexcept;
+		ID3D11DeviceContext4* GetD3DDeviceContext() const noexcept;
+		ID2D1Factory1* GetD2DFactory() const noexcept { return m_d2dFactory.get(); }
+		IDWriteFactory7* GetDWriteFactory() const noexcept { return m_dWriteFactory.get(); }
+		ID2D1RenderTarget* GetD2DRenderTarget() const noexcept { return m_d2dRenderTarget.get(); }
 		IDXGISwapChain4* GetSwapChain() const noexcept;
-		IDXGIAdapter4* GetAdapter() const noexcept;
-		IDXGIFactory5* GetFactory() const noexcept;
-		ID3D11RenderTargetView1* GetRenderTarget() const noexcept { return m_renderTarget.get(); }
+		IDXGIAdapter4* GetDXGIAdapter() const noexcept;
+		IDXGIFactory7* GetDXGIFactory() const noexcept;
+		ID3D11RenderTargetView1* GetRenderTargetView() const noexcept { return m_renderTarget.get(); }
 		ID3D11DepthStencilView* GetDepthStencilView() const noexcept { return m_depthStencilView.get(); }
 		D3D_FEATURE_LEVEL GetFeatureLevel() const noexcept { return m_featureLevel; }
 		D3D11_VIEWPORT GetViewport() const noexcept { return m_viewport; }
@@ -31,18 +34,21 @@ namespace DX
 		void SetWindow(WindowHandle window, int width, int height) noexcept;
 
 	private:
-		winrt::com_ptr<ID3D11Device> m_device;
-		winrt::com_ptr<ID3D11DeviceContext> m_deviceContext;
+		winrt::com_ptr<ID3D11Device> m_d3dDevice;
+		winrt::com_ptr<ID3D11DeviceContext> m_d3dDeviceContext;
+		winrt::com_ptr<ID3D11Texture2D1> m_backBuffer;
+		winrt::com_ptr<ID3D11Texture2D1> m_depthBuffer;
+		winrt::com_ptr<ID3D11RenderTargetView1> m_renderTarget;
+		winrt::com_ptr<ID3D11DepthStencilView> m_depthStencilView;
+
+		winrt::com_ptr<ID2D1Factory1> m_d2dFactory;
+		winrt::com_ptr<ID2D1RenderTarget> m_d2dRenderTarget;
 
 		winrt::com_ptr<IDXGIFactory2> m_dxgiFactory;
 		winrt::com_ptr<IDXGIAdapter1> m_adapter;
 		winrt::com_ptr<IDXGISwapChain1> m_swapChain;
 
-		winrt::com_ptr<ID3D11Texture2D1> m_backBuffer;
-		winrt::com_ptr<ID3D11Texture2D1> m_depthBuffer;
-
-		winrt::com_ptr<ID3D11RenderTargetView1> m_renderTarget;
-		winrt::com_ptr<ID3D11DepthStencilView> m_depthStencilView;
+		winrt::com_ptr<IDWriteFactory7> m_dWriteFactory;
 
 		D3D_FEATURE_LEVEL m_featureLevel;
 		D3D11_VIEWPORT m_viewport;

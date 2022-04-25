@@ -32,16 +32,15 @@ private:
 	std::unique_ptr<DX::MyEffect> m_effect;
 	std::unique_ptr<DX::PerspectiveCamera> m_camera;
 
+	winrt::com_ptr<ID2D1SolidColorBrush> m_brush;
+	winrt::com_ptr<IDWriteTextFormat> m_textFormat;
+
 	std::vector<DX::CubeObject> m_objects;
 
 	std::unique_ptr<DirectX::CommonStates> m_commonStates;
 	std::unique_ptr<DirectX::Keyboard> m_keyboard;
 	std::unique_ptr<DirectX::Mouse> m_mouse;
 	std::unique_ptr<DirectX::GamePad> m_gamepad;
-
-	std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
-	std::unique_ptr<DirectX::SpriteFont> m_spriteFont;
-	char fpsText[48];
 
 	winrt::com_ptr<ID3D11InputLayout> m_inputLayout;
 	winrt::com_ptr<ID3D11ShaderResourceView> m_cubeTexture;

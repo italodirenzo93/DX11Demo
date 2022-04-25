@@ -74,7 +74,7 @@ void SampleScene::GetDefaultSize(int& width, int& height) const noexcept
 
 void SampleScene::CreateDeviceDependentResources()
 {
-	const auto device = m_deviceResources->GetDevice();
+	const auto device = m_deviceResources->GetD3DDevice();
 
 	// Init common states
 	m_commonStates = std::make_unique<CommonStates>(device);
@@ -106,7 +106,7 @@ void SampleScene::CreateDeviceDependentResources()
 		ThrowIfFailed(
 			CreateDDSTextureFromFile(
 				device,
-				m_deviceResources->GetDeviceContext(),
+				m_deviceResources->GetD3DDeviceContext(),
 				L"Assets/braynzar.dds",
 				nullptr,
 				m_cubeTexture.put()
@@ -116,14 +116,26 @@ void SampleScene::CreateDeviceDependentResources()
 		m_effect->SetTexture(m_cubeTexture.get());
 	}
 
-	m_spriteBatch = std::make_unique<SpriteBatch>(m_deviceResources->GetDeviceContext());
-	m_spriteFont = std::make_unique<SpriteFont>(device, L"Assets/consolas.spritefont");
+	ThrowIfFailed(
+		m_deviceResources->GetDWriteFactory()->CreateTextFormat(
+			L"Arial",
+			nullptr,
+			DWRITE_FONT_WEIGHT_REGULAR,
+			DWRITE_FONT_STYLE_NORMAL,
+			DWRITE_FONT_STRETCH_NORMAL,
+			24.0f,
+			L"en-us",
+			m_textFormat.put()
+		)
+	);
 }
 
 void SampleScene::CreateWindowSizeDependentResources()
 {
 	m_camera = std::make_unique<PerspectiveCamera>(Viewport(m_deviceResources->GetViewport()));
 	m_camera->SetWorldPosition(Vector3(0.0f, 0.0f, -3.0f));
+
+	m_deviceResources->GetD2DRenderTarget()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), m_brush.put());
 }
 
 void SampleScene::Update(const StepTimer& timer)
@@ -166,12 +178,12 @@ void SampleScene::Update(const StepTimer& timer)
 	}
 
 	// mouse look
-	if (m_mouse->IsConnected())
-	{
-		const auto mouse = m_mouse->GetState();
+	//if (m_mouse->IsConnected())
+	//{
+	//	const auto mouse = m_mouse->GetState();
 
-		m_camera->Rotate(Vector3(float(mouse.x), float(-mouse.y), 0.0f) * deltaTime);
-	}
+	//	m_camera->Rotate(Vector3(float(mouse.x), float(-mouse.y), 0.0f) * deltaTime);
+	//}
 
 	// Camera controls (gamepad)
 	if (gamepad.IsConnected())
@@ -196,10 +208,10 @@ void SampleScene::Update(const StepTimer& timer)
 
 void SampleScene::Render()
 {
-	const auto ctx = m_deviceResources->GetDeviceContext();
+	const auto ctx = m_deviceResources->GetD3DDeviceContext();
 
 	// Clear render targets
-	ID3D11RenderTargetView* rtv = m_deviceResources->GetRenderTarget();
+	ID3D11RenderTargetView* rtv = m_deviceResources->GetRenderTargetView();
 	ctx->ClearRenderTargetView(rtv, Colors::CornflowerBlue);
 	ctx->ClearDepthStencilView(m_deviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
@@ -232,16 +244,26 @@ void SampleScene::Render()
 		// Draw things
 		ctx->DrawIndexed(obj.GetElementCount(), 0, 0);
 	}
-	
-	// Draw UI text
-	m_spriteBatch->Begin();
-	
-	sprintf_s(fpsText, "%d FPS", m_timer.GetFramesPerSecond());
-	//sprintf_s(fpsText, "X: %d, Y: %d", int(m_mousePos.x), int(m_mousePos.y));
 
-	m_spriteFont->DrawString(m_spriteBatch.get(), fpsText, Vector3::Zero);
+	// Draw 2D overlay
+	{
+		const auto size = m_deviceResources->GetOutputSize();
 
-	m_spriteBatch->End();
+		D2D1_RECT_F d2drect = {};
+		d2drect.top = float(size.top + 5);
+		d2drect.bottom = float(size.bottom - 5);
+		d2drect.left = float(size.left + 5);
+		d2drect.right = float(size.right - 5);
+
+		const auto pRT = m_deviceResources->GetD2DRenderTarget();
+
+		pRT->BeginDraw();
+
+		std::wstring text = L"Hello World!";
+		pRT->DrawText(text.c_str(), static_cast<UINT32>(text.length()), m_textFormat.get(), d2drect, m_brush.get());
+
+		pRT->EndDraw();
+	}
 
 	// Show the back buffer
 	m_deviceResources->GetSwapChain()->Present(1, 0);
