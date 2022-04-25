@@ -42,11 +42,11 @@ void SampleScene::Initialize(const winrt::Windows::UI::Core::CoreWindow& window,
 	m_mouse->SetWindow(window);
 
 	// This is gross, move this into App.cpp somehow...
-	auto di = winrt::Windows::Graphics::Display::DisplayInformation::GetForCurrentView();
-	m_mouse->SetDpi(di.LogicalDpi());
+	//auto di = winrt::Windows::Graphics::Display::DisplayInformation::GetForCurrentView();
+	//m_mouse->SetDpi(di.LogicalDpi());
 
-	m_mouse->SetVisible(false);
-	m_mouse->SetMode(Mouse::MODE_RELATIVE);
+	//m_mouse->SetVisible(false);
+	//m_mouse->SetMode(Mouse::MODE_RELATIVE);
 }
 
 void SampleScene::OnWindowSizeChanged(int width, int height)
@@ -90,7 +90,7 @@ void SampleScene::CreateDeviceDependentResources()
 		size_t bytecodeLength;
 		m_effect->GetVertexShaderBytecode(&bytecodeData, &bytecodeLength);
 
-		ThrowIfFailed(
+		winrt::check_hresult(
 			device->CreateInputLayout(
 				MyEffect::InputLayout,
 				MyEffect::InputLayoutCount,
@@ -103,7 +103,7 @@ void SampleScene::CreateDeviceDependentResources()
 
 	// Load texture for cube
 	{
-		ThrowIfFailed(
+		winrt::check_hresult(
 			CreateDDSTextureFromFile(
 				device,
 				m_deviceResources->GetD3DDeviceContext(),
@@ -116,7 +116,7 @@ void SampleScene::CreateDeviceDependentResources()
 		m_effect->SetTexture(m_cubeTexture.get());
 	}
 
-	ThrowIfFailed(
+	winrt::check_hresult(
 		m_deviceResources->GetDWriteFactory()->CreateTextFormat(
 			L"Arial",
 			nullptr,
@@ -175,6 +175,14 @@ void SampleScene::Update(const StepTimer& timer)
 	if (keyboard.E)
 	{
 		m_camera->Translate(-Vector3::UnitY * CameraSpeed * deltaTime);
+	}
+	if (keyboard.Z)
+	{
+		m_camera->Rotate(-Vector3::UnitX * CameraSpeed * deltaTime);
+	}
+	if (keyboard.C)
+	{
+		m_camera->Rotate(Vector3::UnitX * CameraSpeed * deltaTime);
 	}
 
 	// mouse look

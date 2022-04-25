@@ -61,11 +61,11 @@ namespace DX
 #endif // _DEBUG
 
 
-		ThrowIfFailed(
+		winrt::check_hresult(
 			CreateDXGIFactory2(dxgiFlags, IID_PPV_ARGS(&m_dxgiFactory))
 		);
 
-		ThrowIfFailed(
+		winrt::check_hresult(
 			m_dxgiFactory->EnumAdapters1(0, m_adapter.put())
 		);
 
@@ -84,7 +84,7 @@ namespace DX
 		deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-		ThrowIfFailed(
+		winrt::check_hresult(
 			D3D11CreateDevice(m_adapter.get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, deviceFlags, requestedFeatureLevels, _countof(requestedFeatureLevels),
 				D3D11_SDK_VERSION, m_d3dDevice.put(), &m_featureLevel, m_d3dDeviceContext.put())
 		);
@@ -124,11 +124,11 @@ namespace DX
 			D2D1_FACTORY_OPTIONS options = {};
 			options.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
 
-			ThrowIfFailed(
+			winrt::check_hresult(
 				D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, options, m_d2dFactory.put())
 			);
 #else
-			ThrowIfFailed(
+			winrt::check_hresult(
 				D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, m_d2dFactory.put())
 			);
 #endif
@@ -136,7 +136,7 @@ namespace DX
 
 		// Initialize DirectWrite
 		{
-			ThrowIfFailed(
+			winrt::check_hresult(
 				DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory7), reinterpret_cast<IUnknown**>(m_dWriteFactory.put()))
 			);
 		}
@@ -173,7 +173,7 @@ namespace DX
 			m_renderTarget.put();
 			m_d2dRenderTarget.put();
 
-			ThrowIfFailed(
+			winrt::check_hresult(
 				m_swapChain->ResizeBuffers(0, width, height, m_backBufferFormat, 0)
 			);
 		}
@@ -197,20 +197,20 @@ namespace DX
 			scd.BufferCount = 2;
 			scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
-			ThrowIfFailed(
+			winrt::check_hresult(
 				m_dxgiFactory->CreateSwapChainForCoreWindow(dxgiDevice.get(), m_window, &scd, nullptr, m_swapChain.put())
 			);
 #else
-			ThrowIfFailed(
+			winrt::check_hresult(
 				m_dxgiFactory->CreateSwapChainForHwnd(dxgiDevice.get(), m_window, &scd, nullptr, nullptr, m_swapChain.put())
 			);
 
-			ThrowIfFailed(m_dxgiFactory->MakeWindowAssociation(m_hwnd, DXGI_MWA_NO_ALT_ENTER));
+			winrt::check_hresult(m_dxgiFactory->MakeWindowAssociation(m_hwnd, DXGI_MWA_NO_ALT_ENTER));
 #endif
 		}
 
 		// Get a reference to the back buffer
-		ThrowIfFailed(
+		winrt::check_hresult(
 			m_swapChain->GetBuffer(0, IID_PPV_ARGS(m_backBuffer.put()))
 		);
 
@@ -218,7 +218,7 @@ namespace DX
 		{
 			CD3D11_RENDER_TARGET_VIEW_DESC1 rd(D3D11_RTV_DIMENSION_TEXTURE2D, m_backBufferFormat);
 
-			ThrowIfFailed(
+			winrt::check_hresult(
 				GetD3DDevice()->CreateRenderTargetView1(m_backBuffer.get(), &rd, m_renderTarget.put())
 			);
 		}
@@ -239,14 +239,14 @@ namespace DX
 			depthBufferDesc.CPUAccessFlags = 0;
 			depthBufferDesc.MiscFlags = 0;
 
-			ThrowIfFailed(GetD3DDevice()->CreateTexture2D1(&depthBufferDesc, nullptr, m_depthBuffer.put()));
+			winrt::check_hresult(GetD3DDevice()->CreateTexture2D1(&depthBufferDesc, nullptr, m_depthBuffer.put()));
 
 			D3D11_DEPTH_STENCIL_VIEW_DESC dsv = {};
 			dsv.Texture2D.MipSlice = 0;
 			dsv.Format = m_depthBufferFormat;
 			dsv.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 
-			ThrowIfFailed(
+			winrt::check_hresult(
 				m_d3dDevice->CreateDepthStencilView(m_depthBuffer.get(), &dsv, m_depthStencilView.put())
 			);
 		}
@@ -255,7 +255,7 @@ namespace DX
 		{
 			winrt::com_ptr<IDXGISurface> pSurface;
 
-			ThrowIfFailed(
+			winrt::check_hresult(
 				m_swapChain->GetBuffer(0, IID_PPV_ARGS(pSurface.put()))
 			);
 
@@ -263,7 +263,7 @@ namespace DX
 				D2D1_RENDER_TARGET_TYPE_DEFAULT,
 				D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED));
 
-			ThrowIfFailed(
+			winrt::check_hresult(
 				m_d2dFactory->CreateDxgiSurfaceRenderTarget(pSurface.get(), props, m_d2dRenderTarget.put())
 			);
 		}

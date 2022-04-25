@@ -36,11 +36,11 @@ namespace DX
 			newVerts.emplace_back(vert);
 		}
 
-		ThrowIfFailed(
+		winrt::check_hresult(
 			CreateStaticBuffer(device, newVerts, D3D11_BIND_VERTEX_BUFFER, m_vertexBuffer.put())
 		);
 
-		ThrowIfFailed(
+		winrt::check_hresult(
 			CreateStaticBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, m_indexBuffer.put())
 		);
 
