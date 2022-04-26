@@ -106,6 +106,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeObject.h" />
     <ClInclude Include="DeviceResources.h" />
     <ClInclude Include="MyEffect.h" />
@@ -133,6 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CubeObject.cpp" />
     <ClCompile Include="DeviceResources.cpp" />
     <ClCompile Include="MyEffect.cpp" />
