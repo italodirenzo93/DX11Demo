@@ -131,8 +131,12 @@ void SampleScene::CreateDeviceDependentResources()
 
 void SampleScene::CreateWindowSizeDependentResources()
 {
-	m_camera = std::make_unique<PerspectiveCamera>(Viewport(m_deviceResources->GetViewport()));
-	m_camera->SetWorldPosition(Vector3(0.0f, 0.0f, -3.0f));
+	m_camera = std::make_unique<PerspectiveCamera>();
+
+	const auto viewport = m_deviceResources->GetViewport();
+	m_camera->SetPerspectiveMatrix(XM_PIDIV4, viewport.Width / viewport.Height, 1.0f, 1000.0f);
+
+	m_camera->SetPosition(Vector3(0.0f, 0.0f, -3.0f));
 
 	m_deviceResources->GetD2DRenderTarget()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), m_brush.put());
 }
@@ -175,13 +179,16 @@ void SampleScene::Update(const StepTimer& timer)
 	{
 		m_camera->Translate(-Vector3::UnitY * CameraSpeed * deltaTime);
 	}
+
 	if (keyboard.Z)
 	{
-		m_camera->Rotate(-Vector3::UnitX * CameraSpeed * deltaTime);
+		//m_camera->SetRotation(Quaternion::CreateFromYawPitchRoll(Vector3(0.0f, -0.5f, 0.0f)));
+		m_camera->Rotate(Quaternion::CreateFromYawPitchRoll(-Vector3::UnitY * deltaTime));
 	}
 	if (keyboard.C)
 	{
-		m_camera->Rotate(Vector3::UnitX * CameraSpeed * deltaTime);
+		//m_camera->SetRotation(Quaternion::CreateFromYawPitchRoll(Vector3(0.0f, 0.5f, 0.0f)));
+		m_camera->Rotate(Quaternion::CreateFromYawPitchRoll(Vector3::UnitY * deltaTime));
 	}
 
 	// mouse look
@@ -215,6 +222,8 @@ void SampleScene::Update(const StepTimer& timer)
 
 void SampleScene::Render()
 {
+	m_camera->Update();
+
 	const auto ctx = m_deviceResources->GetD3DDeviceContext();
 
 	// Clear render targets

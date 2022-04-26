@@ -4,73 +4,71 @@
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+static const Vector3 CameraForwardVector = Vector3(0.0f, 0.0f, 1.0f);
+static const Vector3 CameraUpVector = Vector3(0.0f, 1.0f, 0.0f);
+
 namespace DX
 {
-	PerspectiveCamera::PerspectiveCamera(const Viewport& viewport) noexcept
+	PerspectiveCamera::PerspectiveCamera() noexcept
 		:
-		m_viewport(viewport),
-		m_projectionMatrix(Matrix::Identity),
-		m_dirtyProjectionMatrix(true),
-		m_dirtyViewMatrix(true)
+		m_Basis(Matrix::Identity),
+		m_ProjectionMatrix(Matrix::Identity),
+		m_ViewMatrix(Matrix::Identity),
+		m_ViewProjectionMatrix(Matrix::Identity),
+		m_PreviousViewProjectionMatrix(Matrix::Identity)
 	{
 	}
 
-	Matrix PerspectiveCamera::GetProjectionMatrix() noexcept
+	void PerspectiveCamera::Update() noexcept
 	{
-		if (m_dirtyProjectionMatrix)
-		{
-			m_projectionMatrix = XMMatrixPerspectiveFovLH(XM_PI / 4.0f, m_viewport.AspectRatio(), 0.1f, 1000.0f);
+		m_PreviousViewProjectionMatrix = m_ViewProjectionMatrix;
 
-			m_dirtyProjectionMatrix = false;
-		}
+		const auto camTarget = Vector3::Transform(CameraForwardVector, m_Basis);
+		const auto camUp = Vector3::TransformNormal(CameraUpVector, m_Basis);
+
+		m_ViewMatrix = XMMatrixLookAtLH(m_Position, camTarget + m_Position, camUp);
+		m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
+	}
+
+	void PerspectiveCamera::SetEyeAtUp(const DXMath::Vector3& eye, const DXMath::Vector3& at, const DXMath::Vector3& up)
+	{
+		SetLookDirection(at - eye, up);
+		SetPosition(eye);
+	}
+
+	void PerspectiveCamera::SetLookDirection(const DXMath::Vector3& forward, const DXMath::Vector3& up)
+	{
 		
-		return m_projectionMatrix;
 	}
 
-	Matrix PerspectiveCamera::GetViewMatrix() noexcept
+	void PerspectiveCamera::SetPosition(const Vector3& position) noexcept
 	{
-		if (m_dirtyViewMatrix)
-		{
-			m_viewMatrix = XMMatrixLookToLH(m_worldPosition, Vector3::UnitZ + m_worldRotation, Vector3::UnitY);
-
-			m_dirtyViewMatrix = false;
-		}
-
-		return m_viewMatrix;
+		m_Position = position;
 	}
 
-	Matrix PerspectiveCamera::GetWorldMatrix() noexcept
+	void PerspectiveCamera::SetRotation(const Quaternion& rotation) noexcept
 	{
-		// World matrix data (position, rotation) are handled by the camera's view matrix
-		return Matrix::Identity;
+		m_Basis = Matrix::CreateFromQuaternion(rotation);
 	}
 
-	void PerspectiveCamera::SetViewport(const Viewport& viewport) noexcept
+	void PerspectiveCamera::SetPerspectiveMatrix(float verticalFieldOfView, float aspectRatio, float nearZClip, float farZClip)
 	{
-		m_viewport = viewport;
-	}
-
-	void PerspectiveCamera::SetWorldPosition(const Vector3& position) noexcept
-	{
-		SceneObject::SetWorldPosition(position);
-		m_dirtyViewMatrix = true;
-	}
-
-	void PerspectiveCamera::SetWorldRotation(const Vector3& rotation) noexcept
-	{
-		SceneObject::SetWorldRotation(rotation);
-		m_dirtyViewMatrix = true;
+		m_ProjectionMatrix = XMMatrixPerspectiveFovLH(
+			verticalFieldOfView,
+			aspectRatio,
+			nearZClip,
+			farZClip
+		);
 	}
 
 	void PerspectiveCamera::Translate(const Vector3& translation) noexcept
 	{
-		SceneObject::Translate(translation);
-		m_dirtyViewMatrix = true;
+		SetPosition(m_Position + translation);
 	}
 
-	void PerspectiveCamera::Rotate(const Vector3& angles) noexcept
+	void PerspectiveCamera::Rotate(const Quaternion& rotation) noexcept
 	{
-		SceneObject::Rotate(angles);
-		m_dirtyViewMatrix = true;
+		const auto rot = Quaternion::CreateFromRotationMatrix(m_Basis) + rotation;
+		SetRotation(rot);
 	}
 }
