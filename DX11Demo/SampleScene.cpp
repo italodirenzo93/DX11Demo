@@ -8,7 +8,6 @@
 using namespace DX;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
-using winrt::com_ptr;
 
 extern void ExitApplication() noexcept;
 
@@ -42,8 +41,8 @@ void SampleScene::Initialize(const winrt::Windows::UI::Core::CoreWindow& window,
 	m_mouse->SetWindow(window);
 
 	// This is gross, move this into App.cpp somehow...
-	//auto di = winrt::Windows::Graphics::Display::DisplayInformation::GetForCurrentView();
-	//m_mouse->SetDpi(di.LogicalDpi());
+	auto di = winrt::Windows::Graphics::Display::DisplayInformation::GetForCurrentView();
+	m_mouse->SetDpi(di.LogicalDpi());
 
 	//m_mouse->SetVisible(false);
 	//m_mouse->SetMode(Mouse::MODE_RELATIVE);
@@ -256,19 +255,24 @@ void SampleScene::Render()
 	// Draw 2D overlay
 	{
 		const auto size = m_deviceResources->GetOutputSize();
-
-		D2D1_RECT_F d2drect = {};
-		d2drect.top = float(size.top + 5);
-		d2drect.bottom = float(size.bottom - 5);
-		d2drect.left = float(size.left + 5);
-		d2drect.right = float(size.right - 5);
-
 		const auto pRT = m_deviceResources->GetD2DRenderTarget();
 
 		pRT->BeginDraw();
 
-		std::wstring text = L"Hello World!";
-		pRT->DrawText(text.c_str(), static_cast<UINT32>(text.length()), m_textFormat.get(), d2drect, m_brush.get());
+		static const std::wstring text = L"Hello World!";
+
+		pRT->DrawText(
+			text.c_str(),
+			static_cast<UINT32>(text.length()),
+			m_textFormat.get(),
+			D2D1::RectF(
+				float(size.left + 5),
+				float(size.top + 5),
+				float(size.right - 5),
+				float(size.bottom - 5)
+			),
+			m_brush.get()
+		);
 
 		pRT->EndDraw();
 	}
