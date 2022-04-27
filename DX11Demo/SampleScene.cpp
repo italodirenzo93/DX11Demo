@@ -138,7 +138,7 @@ void SampleScene::CreateWindowSizeDependentResources()
 
 	m_camera->SetPosition(Vector3(0.0f, 0.0f, -3.0f));
 
-	m_deviceResources->GetD2DRenderTarget()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), m_brush.put());
+	m_deviceResources->GetD2DDeviceContext()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), m_brush.put());
 }
 
 void SampleScene::Update(const StepTimer& timer)
@@ -264,13 +264,14 @@ void SampleScene::Render()
 	// Draw 2D overlay
 	{
 		const auto size = m_deviceResources->GetOutputSize();
-		const auto pRT = m_deviceResources->GetD2DRenderTarget();
+		const auto d2dContext = m_deviceResources->GetD2DDeviceContext();
+		
 
-		pRT->BeginDraw();
+		d2dContext->BeginDraw();
 
 		static const std::wstring text = L"Hello World!";
 
-		pRT->DrawText(
+		d2dContext->DrawText(
 			text.c_str(),
 			static_cast<UINT32>(text.length()),
 			m_textFormat.get(),
@@ -283,7 +284,7 @@ void SampleScene::Render()
 			m_brush.get()
 		);
 
-		pRT->EndDraw();
+		d2dContext->EndDraw();
 	}
 
 	// Show the back buffer

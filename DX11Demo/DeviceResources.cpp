@@ -54,6 +54,12 @@ namespace DX
 
 	void DeviceResources::CreateDeviceResources()
 	{
+		CreateDeviceIndependentResources();
+		CreateDeviceDependentResources();
+	}
+
+	void DeviceResources::CreateDeviceIndependentResources()
+	{
 		// Create DXGI essentials
 		UINT dxgiFlags = 0;
 #ifdef _DEBUG
@@ -116,9 +122,11 @@ namespace DX
 		//		debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_FLAGS(DXGI_DEBUG_RLO_SUMMARY | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
 		//	}
 		//#endif
+	}
 
-		
-		// Initialize Direct2D
+	void DeviceResources::CreateDeviceDependentResources()
+	{
+		// Initialize Direct2D factory
 		{
 #ifdef _DEBUG
 			D2D1_FACTORY_OPTIONS options = {};
@@ -132,6 +140,17 @@ namespace DX
 				D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, m_d2dFactory.put())
 			);
 #endif
+		}
+
+		// Create Direct2D device and device context
+		{
+			winrt::check_hresult(
+				m_d2dFactory->CreateDevice(m_d3dDevice.as<IDXGIDevice>().get(), m_d2dDevice.put())
+			);
+
+			winrt::check_hresult(
+				m_d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, m_d2dDeviceContext.put())
+			);
 		}
 
 		// Initialize DirectWrite
@@ -171,7 +190,6 @@ namespace DX
 			m_depthBuffer.put();
 			m_backBuffer.put();
 			m_renderTarget.put();
-			m_d2dRenderTarget.put();
 
 			winrt::check_hresult(
 				m_swapChain->ResizeBuffers(0, width, height, m_backBufferFormat, 0)
@@ -190,6 +208,7 @@ namespace DX
 			scd.Scaling = DXGI_SCALING_STRETCH;
 			scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 			scd.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+			scd.Flags = 0;
 
 			auto dxgiDevice = m_d3dDevice.as<IDXGIDevice4>();
 
@@ -255,17 +274,27 @@ namespace DX
 		{
 			winrt::com_ptr<IDXGISurface> pSurface;
 
+			// Get a reference to the back buffer
 			winrt::check_hresult(
 				m_swapChain->GetBuffer(0, IID_PPV_ARGS(pSurface.put()))
 			);
 
-			D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
-				D2D1_RENDER_TARGET_TYPE_DEFAULT,
-				D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED));
-
-			winrt::check_hresult(
-				m_d2dFactory->CreateDxgiSurfaceRenderTarget(pSurface.get(), props, m_d2dRenderTarget.put())
+			const auto props = D2D1::BitmapProperties1(
+				D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
+				D2D1::PixelFormat(m_backBufferFormat, D2D1_ALPHA_MODE_IGNORE)
 			);
+
+			// Create bitmap
+			winrt::check_hresult(
+				m_d2dDeviceContext->CreateBitmapFromDxgiSurface(
+					pSurface.get(),
+					props,
+					m_d2dBitmap.put()
+				)
+			);
+
+			// Set render target
+			m_d2dDeviceContext->SetTarget(m_d2dBitmap.get());
 		}
 	}
 }

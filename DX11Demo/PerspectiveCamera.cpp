@@ -23,10 +23,12 @@ namespace DX
 	{
 		m_PreviousViewProjectionMatrix = m_ViewProjectionMatrix;
 
-		const auto camTarget = Vector3::Transform(CameraForwardVector, m_Basis);
-		const auto camUp = Vector3::TransformNormal(CameraUpVector, m_Basis);
+		auto camTarget = Vector3::Transform(CameraForwardVector, m_Basis);
+		camTarget += m_Position;
 
-		m_ViewMatrix = XMMatrixLookAtLH(m_Position, camTarget + m_Position, camUp);
+		auto camUp = Vector3::TransformNormal(CameraUpVector, m_Basis);
+
+		m_ViewMatrix = XMMatrixLookAtLH(m_Position, camTarget, camUp);
 		m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
 	}
 
