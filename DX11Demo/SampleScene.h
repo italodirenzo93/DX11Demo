@@ -6,13 +6,22 @@
 #include "MyEffect.h"
 #include "PerspectiveCamera.h"
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_PC_APP)
+#include <winrt/Windows.UI.Core.h>
+#endif
+
 class SampleScene
 {
 public:
 	SampleScene();
 	~SampleScene();
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_PC_APP)
 	void Initialize(const winrt::Windows::UI::Core::CoreWindow& window, int width, int height);
+#else
+	void Initialize(HWND hWnd, int width, int height);
+#endif
+
 	void OnWindowSizeChanged(int width, int height);
 	void Tick();
 
@@ -32,8 +41,8 @@ private:
 	std::unique_ptr<DX::MyEffect> m_effect;
 	std::unique_ptr<DX::PerspectiveCamera> m_camera;
 
-	winrt::com_ptr<ID2D1SolidColorBrush> m_brush;
-	winrt::com_ptr<IDWriteTextFormat> m_textFormat;
+	wrl::ComPtr<ID2D1SolidColorBrush> m_brush;
+	wrl::ComPtr<IDWriteTextFormat> m_textFormat;
 
 	std::vector<DX::CubeObject> m_objects;
 
@@ -42,9 +51,9 @@ private:
 	std::unique_ptr<DirectX::Mouse> m_mouse;
 	std::unique_ptr<DirectX::GamePad> m_gamepad;
 
-	winrt::com_ptr<ID3D11InputLayout> m_inputLayout;
-	winrt::com_ptr<ID3D11ShaderResourceView> m_cubeTexture;
+	wrl::ComPtr<ID3D11InputLayout> m_inputLayout;
+	wrl::ComPtr<ID3D11ShaderResourceView> m_cubeTexture;
 
-	::IUnknown* m_window;
+	DX::DeviceResources::WindowHandle m_window;
 };
 

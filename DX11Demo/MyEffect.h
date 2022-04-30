@@ -18,9 +18,9 @@ namespace DX
 		void SetTexture(ID3D11ShaderResourceView* texture);
 
 	private:
-		winrt::com_ptr<ID3D11VertexShader> m_vs;
-		winrt::com_ptr<ID3D11PixelShader> m_ps;
-		winrt::com_ptr<ID3D11ShaderResourceView> m_texture;
+		wrl::ComPtr<ID3D11VertexShader> m_vs;
+		wrl::ComPtr<ID3D11PixelShader> m_ps;
+		wrl::ComPtr<ID3D11ShaderResourceView> m_texture;
 		std::vector<uint8_t> m_vsBlob;
 
 		DirectX::SimpleMath::Matrix m_world;

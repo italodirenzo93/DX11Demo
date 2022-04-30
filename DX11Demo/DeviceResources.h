@@ -17,18 +17,18 @@ namespace DX
 		ID3D11Device5* GetD3DDevice() const noexcept;
 		ID3D11DeviceContext4* GetD3DDeviceContext() const noexcept;
 
-		ID2D1Factory1* GetD2DFactory() const noexcept { return m_d2dFactory.get(); }
-		ID2D1Device* GetD2DDevice() const noexcept { return m_d2dDevice.get(); }
-		ID2D1DeviceContext* GetD2DDeviceContext() const noexcept { return m_d2dDeviceContext.get(); }
+		ID2D1Factory1* GetD2DFactory() const noexcept { return m_d2dFactory.Get(); }
+		ID2D1Device* GetD2DDevice() const noexcept { return m_d2dDevice.Get(); }
+		ID2D1DeviceContext* GetD2DDeviceContext() const noexcept { return m_d2dDeviceContext.Get(); }
 
-		IDWriteFactory7* GetDWriteFactory() const noexcept { return m_dWriteFactory.get(); }
+		IDWriteFactory7* GetDWriteFactory() const noexcept { return m_dWriteFactory.Get(); }
 
 		IDXGISwapChain4* GetSwapChain() const noexcept;
 		IDXGIAdapter4* GetDXGIAdapter() const noexcept;
 		IDXGIFactory7* GetDXGIFactory() const noexcept;
 
-		ID3D11RenderTargetView1* GetRenderTargetView() const noexcept { return m_renderTarget.get(); }
-		ID3D11DepthStencilView* GetDepthStencilView() const noexcept { return m_depthStencilView.get(); }
+		ID3D11RenderTargetView1* GetRenderTargetView() const noexcept { return m_renderTarget.Get(); }
+		ID3D11DepthStencilView* GetDepthStencilView() const noexcept { return m_depthStencilView.Get(); }
 		D3D_FEATURE_LEVEL GetFeatureLevel() const noexcept { return m_featureLevel; }
 		D3D11_VIEWPORT GetViewport() const noexcept { return m_viewport; }
 
@@ -42,23 +42,23 @@ namespace DX
 		void CreateDeviceIndependentResources();
 		void CreateDeviceDependentResources();
 
-		winrt::com_ptr<ID3D11Device> m_d3dDevice;
-		winrt::com_ptr<ID3D11DeviceContext> m_d3dDeviceContext;
-		winrt::com_ptr<ID3D11Texture2D1> m_backBuffer;
-		winrt::com_ptr<ID3D11Texture2D1> m_depthBuffer;
-		winrt::com_ptr<ID3D11RenderTargetView1> m_renderTarget;
-		winrt::com_ptr<ID3D11DepthStencilView> m_depthStencilView;
+		wrl::ComPtr<ID3D11Device> m_d3dDevice;
+		wrl::ComPtr<ID3D11DeviceContext> m_d3dDeviceContext;
+		wrl::ComPtr<ID3D11Texture2D1> m_backBuffer;
+		wrl::ComPtr<ID3D11Texture2D1> m_depthBuffer;
+		wrl::ComPtr<ID3D11RenderTargetView1> m_renderTarget;
+		wrl::ComPtr<ID3D11DepthStencilView> m_depthStencilView;
 
-		winrt::com_ptr<ID2D1Factory1> m_d2dFactory;
-		winrt::com_ptr<ID2D1Device> m_d2dDevice;
-		winrt::com_ptr<ID2D1DeviceContext> m_d2dDeviceContext;
-		winrt::com_ptr<ID2D1Bitmap1> m_d2dBitmap;
+		wrl::ComPtr<ID2D1Factory1> m_d2dFactory;
+		wrl::ComPtr<ID2D1Device> m_d2dDevice;
+		wrl::ComPtr<ID2D1DeviceContext> m_d2dDeviceContext;
+		wrl::ComPtr<ID2D1Bitmap1> m_d2dBitmap;
 
-		winrt::com_ptr<IDXGIFactory2> m_dxgiFactory;
-		winrt::com_ptr<IDXGIAdapter1> m_adapter;
-		winrt::com_ptr<IDXGISwapChain1> m_swapChain;
+		wrl::ComPtr<IDXGIFactory2> m_dxgiFactory;
+		wrl::ComPtr<IDXGIAdapter1> m_adapter;
+		wrl::ComPtr<IDXGISwapChain1> m_swapChain;
 
-		winrt::com_ptr<IDWriteFactory7> m_dWriteFactory;
+		wrl::ComPtr<IDWriteFactory7> m_dWriteFactory;
 
 		D3D_FEATURE_LEVEL m_featureLevel;
 		D3D11_VIEWPORT m_viewport;

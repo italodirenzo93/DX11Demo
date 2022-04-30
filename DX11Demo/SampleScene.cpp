@@ -28,6 +28,10 @@ SampleScene::~SampleScene()
 {
 }
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_PC_APP)
+
+#include <winrt/Windows.Graphics.Display.Core.h>
+
 void SampleScene::Initialize(const winrt::Windows::UI::Core::CoreWindow& window, int width, int height)
 {
 	m_window = winrt::get_unknown(window);
@@ -36,9 +40,10 @@ void SampleScene::Initialize(const winrt::Windows::UI::Core::CoreWindow& window,
 	CreateDeviceDependentResources();
 
 	OnWindowSizeChanged(width, height);
-
-	m_keyboard->SetWindow(window);
-	m_mouse->SetWindow(window);
+	
+	auto pWindow = reinterpret_cast<ABI::Windows::UI::Core::ICoreWindow*>(winrt::get_abi(window));
+	m_keyboard->SetWindow(pWindow);
+	m_mouse->SetWindow(pWindow);
 
 	// This is gross, move this into App.cpp somehow...
 	auto di = winrt::Windows::Graphics::Display::DisplayInformation::GetForCurrentView();
@@ -47,6 +52,20 @@ void SampleScene::Initialize(const winrt::Windows::UI::Core::CoreWindow& window,
 	//m_mouse->SetVisible(false);
 	//m_mouse->SetMode(Mouse::MODE_RELATIVE);
 }
+
+#else
+
+void SampleScene::Initialize(HWND hWnd, int width, int height)
+{
+	m_window = hWnd;
+
+	m_deviceResources->CreateDeviceResources();
+	CreateDeviceDependentResources();
+
+	OnWindowSizeChanged(width, height);
+}
+
+#endif
 
 void SampleScene::OnWindowSizeChanged(int width, int height)
 {
@@ -89,33 +108,33 @@ void SampleScene::CreateDeviceDependentResources()
 		size_t bytecodeLength;
 		m_effect->GetVertexShaderBytecode(&bytecodeData, &bytecodeLength);
 
-		winrt::check_hresult(
+		DX::ThrowIfFailed(
 			device->CreateInputLayout(
 				MyEffect::InputLayout,
 				MyEffect::InputLayoutCount,
 				bytecodeData,
 				bytecodeLength,
-				m_inputLayout.put()
+				m_inputLayout.ReleaseAndGetAddressOf()
 			)
 		);
 	}
 
 	// Load texture for cube
 	{
-		winrt::check_hresult(
+		DX::ThrowIfFailed(
 			CreateDDSTextureFromFile(
 				device,
 				m_deviceResources->GetD3DDeviceContext(),
 				L"Assets/braynzar.dds",
 				nullptr,
-				m_cubeTexture.put()
+				m_cubeTexture.ReleaseAndGetAddressOf()
 			)
 		);
 
-		m_effect->SetTexture(m_cubeTexture.get());
+		m_effect->SetTexture(m_cubeTexture.Get());
 	}
 
-	winrt::check_hresult(
+	DX::ThrowIfFailed(
 		m_deviceResources->GetDWriteFactory()->CreateTextFormat(
 			L"Arial",
 			nullptr,
@@ -124,7 +143,7 @@ void SampleScene::CreateDeviceDependentResources()
 			DWRITE_FONT_STRETCH_NORMAL,
 			24.0f,
 			L"en-us",
-			m_textFormat.put()
+			m_textFormat.ReleaseAndGetAddressOf()
 		)
 	);
 }
@@ -138,7 +157,7 @@ void SampleScene::CreateWindowSizeDependentResources()
 
 	m_camera->SetPosition(Vector3(0.0f, 0.0f, -3.0f));
 
-	m_deviceResources->GetD2DDeviceContext()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), m_brush.put());
+	m_deviceResources->GetD2DDeviceContext()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), m_brush.ReleaseAndGetAddressOf());
 }
 
 void SampleScene::Update(const StepTimer& timer)
@@ -243,7 +262,7 @@ void SampleScene::Render()
 
 	// Input assembler
 	ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	ctx->IASetInputLayout(m_inputLayout.get());
+	ctx->IASetInputLayout(m_inputLayout.Get());
 
 	// Draw each cube
 	for (auto& obj : m_objects)
@@ -274,14 +293,14 @@ void SampleScene::Render()
 		d2dContext->DrawText(
 			text.c_str(),
 			static_cast<UINT32>(text.length()),
-			m_textFormat.get(),
+			m_textFormat.Get(),
 			D2D1::RectF(
 				float(size.left + 5),
 				float(size.top + 5),
 				float(size.right - 5),
 				float(size.bottom - 5)
 			),
-			m_brush.get()
+			m_brush.Get()
 		);
 
 		d2dContext->EndDraw();

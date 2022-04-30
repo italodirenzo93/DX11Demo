@@ -20,11 +20,11 @@ namespace DX
 	{
 		m_vsBlob = ReadData(L"VertexShader.cso");
 
-		winrt::check_hresult(device->CreateVertexShader(m_vsBlob.data(), m_vsBlob.size(), nullptr, m_vs.put()));
+		DX::ThrowIfFailed(device->CreateVertexShader(m_vsBlob.data(), m_vsBlob.size(), nullptr, m_vs.ReleaseAndGetAddressOf()));
 
 		auto psBlob = ReadData(L"PixelShader.cso");
 
-		winrt::check_hresult(device->CreatePixelShader(psBlob.data(), psBlob.size(), nullptr, m_ps.put()));
+		DX::ThrowIfFailed(device->CreatePixelShader(psBlob.data(), psBlob.size(), nullptr, m_ps.ReleaseAndGetAddressOf()));
 
 		m_commonStates = std::make_unique<CommonStates>(device);
 	}
@@ -52,14 +52,14 @@ namespace DX
 		const auto cb = m_constantBuffer.GetBuffer();
 		deviceContext->VSSetConstantBuffers(0, 1, &cb);
 
-		const auto sr = m_texture.get();
+		const auto sr = m_texture.Get();
 		deviceContext->PSSetShaderResources(0, 1, &sr);
 
 		const auto samplers = m_commonStates->PointClamp();
 		deviceContext->PSSetSamplers(0, 1, &samplers);
 
-		deviceContext->VSSetShader(m_vs.get(), nullptr, 0);
-		deviceContext->PSSetShader(m_ps.get(), nullptr, 0);
+		deviceContext->VSSetShader(m_vs.Get(), nullptr, 0);
+		deviceContext->PSSetShader(m_ps.Get(), nullptr, 0);
 	}
 
 	void MyEffect::GetVertexShaderBytecode(void const** pShaderBytecode, size_t* pBytecodeLength)
@@ -97,6 +97,6 @@ namespace DX
 
 	void MyEffect::SetTexture(ID3D11ShaderResourceView* texture)
 	{
-		m_texture.attach(texture);
+		m_texture = texture;
 	}
 }

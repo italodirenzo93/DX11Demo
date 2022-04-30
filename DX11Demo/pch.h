@@ -1,19 +1,25 @@
 ﻿#pragma once
 
-#include <windows.h>
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.Foundation.Collections.h>
-#include <winrt/Windows.ApplicationModel.Core.h>
-#include <winrt/Windows.Graphics.Display.Core.h>
-#include <winrt/Windows.UI.Core.h>
-#include <winrt/Windows.UI.Composition.h>
-#include <winrt/Windows.UI.Input.h>
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <Windows.h>
+
+// For ComPtr<T>
+#include <wrl/client.h>
 
 // DirectX headers
 #include <d3d11_4.h>
+#pragma comment (lib, "d3d11.lib")
+
 #include <dxgi1_6.h>
+#pragma comment (lib, "dxgi.lib")
+
 #include <d2d1_1.h>
+#pragma comment (lib, "d2d1.lib")
+
 #include <dwrite_3.h>
+#pragma comment (lib, "dwrite.lib")
 
 #ifdef _DEBUG
 #include <dxgidebug.h>
@@ -40,7 +46,8 @@
 #include <VertexTypes.h>
 
 // Namespace aliases
-namespace DXMath = DirectX::SimpleMath;
+namespace wrl = Microsoft::WRL;
+namespace math = DirectX::SimpleMath;
 
 namespace DX
 {

@@ -36,12 +36,12 @@ namespace DX
 			newVerts.emplace_back(vert);
 		}
 
-		winrt::check_hresult(
-			CreateStaticBuffer(device, newVerts, D3D11_BIND_VERTEX_BUFFER, m_vertexBuffer.put())
+		DX::ThrowIfFailed(
+			CreateStaticBuffer(device, newVerts, D3D11_BIND_VERTEX_BUFFER, m_vertexBuffer.ReleaseAndGetAddressOf())
 		);
 
-		winrt::check_hresult(
-			CreateStaticBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, m_indexBuffer.put())
+		DX::ThrowIfFailed(
+			CreateStaticBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, m_indexBuffer.ReleaseAndGetAddressOf())
 		);
 
 		m_numElements = static_cast<UINT>(indices.size());
