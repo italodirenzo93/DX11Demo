@@ -8,7 +8,7 @@ namespace DX
 		DeviceResources(DXGI_FORMAT backBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_FORMAT depthBufferFormat = DXGI_FORMAT_D32_FLOAT);
 		~DeviceResources();
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_PC_APP)
+#ifdef WINDOWS_UWP
 		using WindowHandle = ::IUnknown*;
 #else
 		using WindowHandle = HWND;
@@ -27,7 +27,7 @@ namespace DX
 		IDXGIAdapter4* GetDXGIAdapter() const noexcept;
 		IDXGIFactory7* GetDXGIFactory() const noexcept;
 
-		ID3D11RenderTargetView1* GetRenderTargetView() const noexcept { return m_renderTarget.Get(); }
+		ID3D11RenderTargetView1* GetRenderTargetView() const noexcept { return m_renderTargetView.Get(); }
 		ID3D11DepthStencilView* GetDepthStencilView() const noexcept { return m_depthStencilView.Get(); }
 		D3D_FEATURE_LEVEL GetFeatureLevel() const noexcept { return m_featureLevel; }
 		D3D11_VIEWPORT GetViewport() const noexcept { return m_viewport; }
@@ -46,7 +46,7 @@ namespace DX
 		wrl::ComPtr<ID3D11DeviceContext> m_d3dDeviceContext;
 		wrl::ComPtr<ID3D11Texture2D1> m_backBuffer;
 		wrl::ComPtr<ID3D11Texture2D1> m_depthBuffer;
-		wrl::ComPtr<ID3D11RenderTargetView1> m_renderTarget;
+		wrl::ComPtr<ID3D11RenderTargetView1> m_renderTargetView;
 		wrl::ComPtr<ID3D11DepthStencilView> m_depthStencilView;
 
 		wrl::ComPtr<ID2D1Factory1> m_d2dFactory;

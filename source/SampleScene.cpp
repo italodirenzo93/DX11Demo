@@ -28,10 +28,9 @@ SampleScene::~SampleScene()
 {
 }
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_PC_APP)
+#ifdef WINDOWS_UWP
 
 #include <winrt/Windows.Graphics.Display.Core.h>
-
 
 void SampleScene::Initialize(const winrt::Windows::UI::Core::CoreWindow& window, int width, int height)
 {

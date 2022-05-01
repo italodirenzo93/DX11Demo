@@ -5,6 +5,8 @@ VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DX11Demo-uwp", "DX11Demo-uwp\DX11Demo-uwp.vcxproj", "{E4F0ABBF-D4A6-40AB-8151-E50BF897080F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DX11Demo", "DX11Demo\DX11Demo.vcxproj", "{B197DD08-EAF0-4758-9A62-9AF4ADB5A32A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -41,6 +43,22 @@ Global
 		{E4F0ABBF-D4A6-40AB-8151-E50BF897080F}.Release|x86.ActiveCfg = Release|Win32
 		{E4F0ABBF-D4A6-40AB-8151-E50BF897080F}.Release|x86.Build.0 = Release|Win32
 		{E4F0ABBF-D4A6-40AB-8151-E50BF897080F}.Release|x86.Deploy.0 = Release|Win32
+		{B197DD08-EAF0-4758-9A62-9AF4ADB5A32A}.Debug|ARM.ActiveCfg = Debug|x64
+		{B197DD08-EAF0-4758-9A62-9AF4ADB5A32A}.Debug|ARM.Build.0 = Debug|x64
+		{B197DD08-EAF0-4758-9A62-9AF4ADB5A32A}.Debug|ARM64.ActiveCfg = Debug|x64
+		{B197DD08-EAF0-4758-9A62-9AF4ADB5A32A}.Debug|ARM64.Build.0 = Debug|x64
+		{B197DD08-EAF0-4758-9A62-9AF4ADB5A32A}.Debug|x64.ActiveCfg = Debug|x64
+		{B197DD08-EAF0-4758-9A62-9AF4ADB5A32A}.Debug|x64.Build.0 = Debug|x64
+		{B197DD08-EAF0-4758-9A62-9AF4ADB5A32A}.Debug|x86.ActiveCfg = Debug|Win32
+		{B197DD08-EAF0-4758-9A62-9AF4ADB5A32A}.Debug|x86.Build.0 = Debug|Win32
+		{B197DD08-EAF0-4758-9A62-9AF4ADB5A32A}.Release|ARM.ActiveCfg = Release|x64
+		{B197DD08-EAF0-4758-9A62-9AF4ADB5A32A}.Release|ARM.Build.0 = Release|x64
+		{B197DD08-EAF0-4758-9A62-9AF4ADB5A32A}.Release|ARM64.ActiveCfg = Release|x64
+		{B197DD08-EAF0-4758-9A62-9AF4ADB5A32A}.Release|ARM64.Build.0 = Release|x64
+		{B197DD08-EAF0-4758-9A62-9AF4ADB5A32A}.Release|x64.ActiveCfg = Release|x64
+		{B197DD08-EAF0-4758-9A62-9AF4ADB5A32A}.Release|x64.Build.0 = Release|x64
+		{B197DD08-EAF0-4758-9A62-9AF4ADB5A32A}.Release|x86.ActiveCfg = Release|Win32
+		{B197DD08-EAF0-4758-9A62-9AF4ADB5A32A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

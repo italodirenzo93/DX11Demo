@@ -6,7 +6,7 @@
 #include "MyEffect.h"
 #include "PerspectiveCamera.h"
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_PC_APP)
+#ifdef WINDOWS_UWP
 #include <winrt/Windows.UI.Core.h>
 #endif
 
@@ -16,7 +16,7 @@ public:
 	SampleScene();
 	~SampleScene();
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_PC_APP)
+#ifdef WINDOWS_UWP
 	void Initialize(const winrt::Windows::UI::Core::CoreWindow& window, int width, int height);
 #else
 	void Initialize(HWND hWnd, int width, int height);

@@ -131,13 +131,13 @@ namespace DX
 			pInfoQueue->AddStorageFilterEntries(&filter);
 		}
 
-		//#ifdef _DEBUG
-		//	ComPtr<IDXGIDebug1> debug;
-		//	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug))))
-		//	{
-		//		debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_FLAGS(DXGI_DEBUG_RLO_SUMMARY | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
-		//	}
-		//#endif
+#ifdef _DEBUG
+			ComPtr<IDXGIDebug1> debug;
+			if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug))))
+			{
+				debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_FLAGS(DXGI_DEBUG_RLO_SUMMARY | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
+			}
+#endif
 	}
 
 	void DeviceResources::CreateDeviceDependentResources()
@@ -184,7 +184,7 @@ namespace DX
 	{
 		if (!m_window)
 		{
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_PC_APP)
+#ifdef WINDOWS_UWP
 			throw std::logic_error("Call SetWindow with a valid CoreWindow pointer");
 #else
 			throw std::logic_error("Call SetWindow with a valid Win32 window handle");
@@ -206,9 +206,14 @@ namespace DX
 		if (m_swapChain)
 		{
 			// Release swap chain resources
+			m_d2dDeviceContext->SetTarget(nullptr);
+			m_d2dBitmap.Reset();
+
+			m_depthStencilView.Reset();
 			m_depthBuffer.Reset();
+
+			m_renderTargetView.Reset();
 			m_backBuffer.Reset();
-			m_renderTarget.Reset();
 
 			DX::ThrowIfFailed(
 				m_swapChain->ResizeBuffers(0, width, height, m_backBufferFormat, 0)
@@ -217,7 +222,6 @@ namespace DX
 		else
 		{
 			DXGI_SWAP_CHAIN_DESC1 scd = {};
-			scd.BufferCount = 1;
 			scd.Width = static_cast<UINT>(m_viewport.Width);
 			scd.Height = static_cast<UINT>(m_viewport.Height);
 			scd.Format = m_backBufferFormat;
@@ -225,26 +229,30 @@ namespace DX
 			scd.SampleDesc.Count = 1;
 			scd.SampleDesc.Quality = 0;
 			scd.Scaling = DXGI_SCALING_STRETCH;
-			scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 			scd.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
 			scd.Flags = 0;
+
+//#ifdef WINDOWS_UWP
+			scd.BufferCount = 2;
+			scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+//#else
+//			scd.BufferCount = 1;
+//			scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+//#endif
 
 			ComPtr<IDXGIDevice4> pDevice;
 			m_d3dDevice.As(&pDevice);
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_PC_APP)
-			scd.BufferCount = 2;
-			scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-
+#ifdef WINDOWS_UWP
 			DX::ThrowIfFailed(
 				m_dxgiFactory->CreateSwapChainForCoreWindow(pDevice.Get(), m_window, &scd, nullptr, m_swapChain.ReleaseAndGetAddressOf())
 			);
 #else
 			DX::ThrowIfFailed(
-				m_dxgiFactory->CreateSwapChainForHwnd(dxgiDevice.Get(), m_window, &scd, nullptr, nullptr, m_swapChain.ReleaseAndGetAddressOf())
+				m_dxgiFactory->CreateSwapChainForHwnd(pDevice.Get(), m_window, &scd, nullptr, nullptr, m_swapChain.ReleaseAndGetAddressOf())
 			);
 
-			DX::ThrowIfFailed(m_dxgiFactory->MakeWindowAssociation(m_hwnd, DXGI_MWA_NO_ALT_ENTER));
+			DX::ThrowIfFailed(m_dxgiFactory->MakeWindowAssociation(m_window, DXGI_MWA_NO_ALT_ENTER));
 #endif
 		}
 
@@ -258,7 +266,7 @@ namespace DX
 			CD3D11_RENDER_TARGET_VIEW_DESC1 rd(D3D11_RTV_DIMENSION_TEXTURE2D, m_backBufferFormat);
 
 			DX::ThrowIfFailed(
-				GetD3DDevice()->CreateRenderTargetView1(m_backBuffer.Get(), &rd, m_renderTarget.ReleaseAndGetAddressOf())
+				GetD3DDevice()->CreateRenderTargetView1(m_backBuffer.Get(), &rd, m_renderTargetView.ReleaseAndGetAddressOf())
 			);
 		}
 
@@ -315,6 +323,8 @@ namespace DX
 
 			// Set render target
 			m_d2dDeviceContext->SetTarget(m_d2dBitmap.Get());
+
+			pSurface.Reset();
 		}
 	}
 }
