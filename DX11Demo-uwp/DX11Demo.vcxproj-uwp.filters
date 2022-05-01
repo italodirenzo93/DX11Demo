@@ -1,25 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="App.cpp" />
-    <ClCompile Include="pch.cpp" />
-    <ClCompile Include="DeviceResources.cpp" />
-    <ClCompile Include="SampleScene.cpp" />
-    <ClCompile Include="SceneObject.cpp" />
-    <ClCompile Include="CubeObject.cpp" />
-    <ClCompile Include="MyEffect.cpp" />
-    <ClCompile Include="PerspectiveCamera.cpp" />
+    <ClCompile Include="../source/App.cpp" />
+    <ClCompile Include="../source/pch.cpp" />
+    <ClCompile Include="../source/DeviceResources.cpp" />
+    <ClCompile Include="../source/SampleScene.cpp" />
+    <ClCompile Include="../source/SceneObject.cpp" />
+    <ClCompile Include="../source/CubeObject.cpp" />
+    <ClCompile Include="../source/MyEffect.cpp" />
+    <ClCompile Include="../source/PerspectiveCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pch.h" />
-    <ClInclude Include="StepTimer.h" />
-    <ClInclude Include="DeviceResources.h" />
-    <ClInclude Include="SampleScene.h" />
-    <ClInclude Include="ReadData.h" />
-    <ClInclude Include="SceneObject.h" />
-    <ClInclude Include="CubeObject.h" />
-    <ClInclude Include="MyEffect.h" />
-    <ClInclude Include="PerspectiveCamera.h" />
+    <ClInclude Include="../source/pch.h" />
+    <ClInclude Include="../source/StepTimer.h" />
+    <ClInclude Include="../source/DeviceResources.h" />
+    <ClInclude Include="../source/SampleScene.h" />
+    <ClInclude Include="../source/ReadData.h" />
+    <ClInclude Include="../source/SceneObject.h" />
+    <ClInclude Include="../source/CubeObject.h" />
+    <ClInclude Include="../source/MyEffect.h" />
+    <ClInclude Include="../source/PerspectiveCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Wide310x150Logo.scale-200.png">
@@ -43,9 +43,6 @@
     <Image Include="Assets\LockScreenLogo.scale-200.png">
       <Filter>Assets</Filter>
     </Image>
-    <Image Include="Assets\braynzar.dds">
-      <Filter>Assets</Filter>
-    </Image>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest" />
@@ -58,13 +55,12 @@
   <ItemGroup>
     <None Include="PropertySheet.props" />
     <None Include="packages.config" />
-    <None Include="common.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="VertexShader.hlsl" />
-    <FxCompile Include="PixelShader.hlsl" />
+    <FxCompile Include="../shaders/VertexShader.hlsl" />
+    <FxCompile Include="../shaders/PixelShader.hlsl" />
   </ItemGroup>
 </Project>

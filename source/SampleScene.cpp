@@ -32,6 +32,7 @@ SampleScene::~SampleScene()
 
 #include <winrt/Windows.Graphics.Display.Core.h>
 
+
 void SampleScene::Initialize(const winrt::Windows::UI::Core::CoreWindow& window, int width, int height)
 {
 	m_window = winrt::get_unknown(window);
@@ -125,7 +126,7 @@ void SampleScene::CreateDeviceDependentResources()
 			CreateDDSTextureFromFile(
 				device,
 				m_deviceResources->GetD3DDeviceContext(),
-				L"Assets/braynzar.dds",
+				L"braynzar.dds",
 				nullptr,
 				m_cubeTexture.ReleaseAndGetAddressOf()
 			)
