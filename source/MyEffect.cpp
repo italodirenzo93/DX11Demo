@@ -20,11 +20,11 @@ namespace DX
 	{
 		m_vsBlob = ReadData(L"VertexShader.cso");
 
-		DX::ThrowIfFailed(device->CreateVertexShader(m_vsBlob.data(), m_vsBlob.size(), nullptr, m_vs.put()));
+		winrt::check_hresult(device->CreateVertexShader(m_vsBlob.data(), m_vsBlob.size(), nullptr, m_vs.put()));
 
 		auto psBlob = ReadData(L"PixelShader.cso");
 
-		DX::ThrowIfFailed(device->CreatePixelShader(psBlob.data(), psBlob.size(), nullptr, m_ps.put()));
+		winrt::check_hresult(device->CreatePixelShader(psBlob.data(), psBlob.size(), nullptr, m_ps.put()));
 
 		m_commonStates = std::make_unique<CommonStates>(device);
 	}

@@ -108,7 +108,7 @@ void SampleScene::CreateDeviceDependentResources()
 		size_t bytecodeLength;
 		m_effect->GetVertexShaderBytecode(&bytecodeData, &bytecodeLength);
 
-		DX::ThrowIfFailed(
+		winrt::check_hresult(
 			device->CreateInputLayout(
 				MyEffect::InputLayout,
 				MyEffect::InputLayoutCount,
@@ -121,7 +121,7 @@ void SampleScene::CreateDeviceDependentResources()
 
 	// Load texture for cube
 	{
-		DX::ThrowIfFailed(
+		winrt::check_hresult(
 			CreateDDSTextureFromFile(
 				device,
 				m_deviceResources->GetD3DDeviceContext(),
@@ -134,7 +134,7 @@ void SampleScene::CreateDeviceDependentResources()
 		m_effect->SetTexture(m_cubeTexture);
 	}
 
-	DX::ThrowIfFailed(
+	winrt::check_hresult(
 		m_deviceResources->GetDWriteFactory()->CreateTextFormat(
 			L"Arial",
 			nullptr,
