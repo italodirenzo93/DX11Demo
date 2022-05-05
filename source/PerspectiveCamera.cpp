@@ -32,13 +32,13 @@ namespace DX
 		m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
 	}
 
-	void PerspectiveCamera::SetEyeAtUp(const math::Vector3& eye, const math::Vector3& at, const math::Vector3& up)
+	void PerspectiveCamera::SetEyeAtUp(const Vector3& eye, const Vector3& at, const Vector3& up)
 	{
 		SetLookDirection(at - eye, up);
 		SetPosition(eye);
 	}
 
-	void PerspectiveCamera::SetLookDirection(const math::Vector3& forward, const math::Vector3& up)
+	void PerspectiveCamera::SetLookDirection(const Vector3& forward, const Vector3& up)
 	{
 		
 	}

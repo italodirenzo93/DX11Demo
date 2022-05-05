@@ -5,36 +5,40 @@ namespace DX
 	class PerspectiveCamera
 	{
 	public:
+		using VectorType = DirectX::SimpleMath::Vector3;
+		using MatrixType = DirectX::SimpleMath::Matrix;
+		using QuaternionType = DirectX::SimpleMath::Quaternion;
+
 		PerspectiveCamera() noexcept;
 
 		void Update() noexcept;
 
-		const math::Vector3 GetRightVec() const noexcept { return m_Basis.Right(); }
-		const math::Vector3 GetUpVec() const noexcept { return m_Basis.Up(); }
-		const math::Vector3 GetFowardVec() const noexcept { return m_Basis.Forward(); }
+		const VectorType GetRightVec() const noexcept { return m_Basis.Right(); }
+		const VectorType GetUpVec() const noexcept { return m_Basis.Up(); }
+		const VectorType GetFowardVec() const noexcept { return m_Basis.Forward(); }
 
-		math::Matrix GetProjectionMatrix() const noexcept { return m_ProjectionMatrix; }
-		math::Matrix GetViewMatrix() const noexcept { return m_ViewMatrix; }
-		math::Matrix GetViewProjectionMatrix() const noexcept { return m_ViewProjectionMatrix; }
+		MatrixType GetProjectionMatrix() const noexcept { return m_ProjectionMatrix; }
+		MatrixType GetViewMatrix() const noexcept { return m_ViewMatrix; }
+		MatrixType GetViewProjectionMatrix() const noexcept { return m_ViewProjectionMatrix; }
 
-		void SetEyeAtUp(const math::Vector3& eye, const math::Vector3& at, const math::Vector3& up);
-		void SetLookDirection(const math::Vector3& forward, const math::Vector3& up);
-		void SetPosition(const math::Vector3& position) noexcept;
-		void SetRotation(const math::Quaternion& rotation) noexcept;
+		void SetEyeAtUp(const VectorType& eye, const VectorType& at, const VectorType& up);
+		void SetLookDirection(const VectorType& forward, const VectorType& up);
+		void SetPosition(const VectorType& position) noexcept;
+		void SetRotation(const QuaternionType& rotation) noexcept;
 
 		void SetPerspectiveMatrix(float verticalFieldOfView, float aspectRatio, float nearZClip, float farZClip);
 
-		void Translate(const math::Vector3& translation) noexcept;
-		void Rotate(const math::Quaternion& rotation) noexcept;
+		void Translate(const VectorType& translation) noexcept;
+		void Rotate(const QuaternionType& rotation) noexcept;
 
 	private:
-		math::Matrix m_Basis;
+		MatrixType m_Basis;
 
-		math::Vector3 m_Position;
+		VectorType m_Position;
 
-		math::Matrix m_ProjectionMatrix;
-		math::Matrix m_ViewMatrix;
-		math::Matrix m_ViewProjectionMatrix;
-		math::Matrix m_PreviousViewProjectionMatrix;
+		MatrixType m_ProjectionMatrix;
+		MatrixType m_ViewMatrix;
+		MatrixType m_ViewProjectionMatrix;
+		MatrixType m_PreviousViewProjectionMatrix;
 	};
 }

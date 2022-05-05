@@ -60,9 +60,6 @@
 #include <SimpleMath.h>
 #include <VertexTypes.h>
 
-// Namespace aliases
-namespace math = DirectX::SimpleMath;
-
 namespace DX
 {
 	// Helper class for COM exceptions
