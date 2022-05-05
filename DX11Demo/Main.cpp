@@ -73,6 +73,14 @@ LRESULT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		PostQuitMessage(0);
 		break;
 
+	case WM_GETMINMAXINFO:
+	{
+		auto minMaxInfo = (MINMAXINFO*)lParam;
+		minMaxInfo->ptMinTrackSize.x = 320;
+		minMaxInfo->ptMinTrackSize.y = 240;
+	}
+		break;
+
 	case WM_SIZE:
 		if (scene && wParam != SIZE_MINIMIZED)
 		{
