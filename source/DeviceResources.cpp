@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "DeviceResources.h"
 
-using Microsoft::WRL::ComPtr;
-
 namespace DX
 {
 	DeviceResources::DeviceResources(DXGI_FORMAT backBufferFormat, DXGI_FORMAT depthBufferFormat)
@@ -22,37 +20,42 @@ namespace DX
 
 	ID3D11Device5* DeviceResources::GetD3DDevice() const noexcept
 	{
-		ComPtr<ID3D11Device5> pDevice5;
-		m_d3dDevice.As(&pDevice5);
-		return pDevice5.Get();
+		//winrt::com_ptr<ID3D11Device5> pDevice;
+		//m_d3dDevice.as(pDevice);
+		//return pDevice.get();
+		return m_d3dDevice.as<ID3D11Device5>().get();
 	}
 
 	ID3D11DeviceContext4* DeviceResources::GetD3DDeviceContext() const noexcept
 	{
-		ComPtr<ID3D11DeviceContext4> pDeviceContext4;
-		m_d3dDeviceContext.As(&pDeviceContext4);
-		return pDeviceContext4.Get();
+		//winrt::com_ptr<ID3D11DeviceContext4> pDeviceContext;
+		//m_d3dDeviceContext.as(pDeviceContext);
+		//return pDeviceContext.get();
+		return m_d3dDeviceContext.as<ID3D11DeviceContext4>().get();
 	}
 
 	IDXGISwapChain4* DeviceResources::GetSwapChain() const noexcept
 	{
-		ComPtr<IDXGISwapChain4> pSwapChain4;
-		m_swapChain.As(&pSwapChain4);
-		return pSwapChain4.Get();
+		//winrt::com_ptr<IDXGISwapChain4> pSwapChain;
+		//m_swapChain.as(pSwapChain);
+		//return pSwapChain.get();
+		return m_swapChain.as<IDXGISwapChain4>().get();
 	}
 
 	IDXGIAdapter4* DeviceResources::GetDXGIAdapter() const noexcept
 	{
-		ComPtr<IDXGIAdapter4> pAdapter4;
-		m_adapter.As(&pAdapter4);
-		return pAdapter4.Get();
+		//winrt::com_ptr<IDXGIAdapter4> pAdapter;
+		//m_adapter.as(pAdapter);
+		//return pAdapter.get();
+		return m_adapter.as<IDXGIAdapter4>().get();
 	}
 
 	IDXGIFactory7* DeviceResources::GetDXGIFactory() const noexcept
 	{
-		ComPtr<IDXGIFactory7> pFactory7;
-		m_dxgiFactory.As(&pFactory7);
-		return pFactory7.Get();
+		//winrt::com_ptr<IDXGIFactory7> pFactory;
+		//m_dxgiFactory.as(pFactory);
+		//return pFactory.get();
+		return m_dxgiFactory.as<IDXGIFactory7>().get();
 	}
 
 	void DeviceResources::SetWindow(WindowHandle window, int width, int height) noexcept
@@ -84,7 +87,7 @@ namespace DX
 		);
 
 		DX::ThrowIfFailed(
-			m_dxgiFactory->EnumAdapters1(0, m_adapter.ReleaseAndGetAddressOf())
+			m_dxgiFactory->EnumAdapters1(0, m_adapter.put())
 		);
 
 		static const D3D_FEATURE_LEVEL requestedFeatureLevels[] = {
@@ -103,17 +106,19 @@ namespace DX
 #endif
 
 		DX::ThrowIfFailed(
-			D3D11CreateDevice(m_adapter.Get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, deviceFlags, requestedFeatureLevels, _countof(requestedFeatureLevels),
-				D3D11_SDK_VERSION, m_d3dDevice.ReleaseAndGetAddressOf(), &m_featureLevel, m_d3dDeviceContext.ReleaseAndGetAddressOf())
+			D3D11CreateDevice(m_adapter.get(), D3D_DRIVER_TYPE_UNKNOWN, nullptr, deviceFlags, requestedFeatureLevels, _countof(requestedFeatureLevels),
+				D3D11_SDK_VERSION, m_d3dDevice.put(), &m_featureLevel, m_d3dDeviceContext.put())
 		);
 
 		// Initialize debug layer
 		{
-			ComPtr<ID3D11Debug> pDebug;
-			m_d3dDevice.As(&pDebug);
+			//winrt::com_ptr<ID3D11Debug> pDebug;
+			//winrt::com_ptr<ID3D11InfoQueue> pInfoQueue;
 
-			ComPtr<ID3D11InfoQueue> pInfoQueue;
-			pDebug.As(&pInfoQueue);
+			//m_d3dDevice.as(pDebug);
+			//pDebug.as(pInfoQueue);
+
+			auto pInfoQueue = m_d3dDevice.as<ID3D11Debug>().as<ID3D11InfoQueue>();
 
 #ifdef _DEBUG
 			pInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
@@ -132,8 +137,8 @@ namespace DX
 		}
 
 #ifdef _DEBUG
-			ComPtr<IDXGIDebug1> debug;
-			if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug))))
+			winrt::com_ptr<IDXGIDebug1> debug;
+			if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(debug.put()))))
 			{
 				debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_FLAGS(DXGI_DEBUG_RLO_SUMMARY | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
 			}
@@ -149,33 +154,32 @@ namespace DX
 			options.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
 
 			DX::ThrowIfFailed(
-				D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, options, m_d2dFactory.ReleaseAndGetAddressOf())
+				D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, options, m_d2dFactory.put())
 			);
 #else
 			DX::ThrowIfFailed(
-				D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, m_d2dFactory.ReleaseAndGetAddressOf())
+				D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, m_d2dFactory.put())
 			);
 #endif
 		}
 
 		// Create Direct2D device and device context
 		{
-			ComPtr<IDXGIDevice> pDevice;
-			m_d3dDevice.As(&pDevice);
+			auto pDevice = m_d3dDevice.as<IDXGIDevice>();
 
 			DX::ThrowIfFailed(
-				m_d2dFactory->CreateDevice(pDevice.Get(), m_d2dDevice.ReleaseAndGetAddressOf())
+				m_d2dFactory->CreateDevice(pDevice.get(), m_d2dDevice.put())
 			);
 
 			DX::ThrowIfFailed(
-				m_d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, m_d2dDeviceContext.ReleaseAndGetAddressOf())
+				m_d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, m_d2dDeviceContext.put())
 			);
 		}
 
 		// Initialize DirectWrite
 		{
 			DX::ThrowIfFailed(
-				DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory7), reinterpret_cast<IUnknown**>(m_dWriteFactory.ReleaseAndGetAddressOf()))
+				DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory7), reinterpret_cast<IUnknown**>(m_dWriteFactory.put()))
 			);
 		}
 	}
@@ -206,14 +210,15 @@ namespace DX
 		if (m_swapChain)
 		{
 			// Release swap chain resources
+			m_d3dDeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
 			m_d2dDeviceContext->SetTarget(nullptr);
-			m_d2dBitmap.Reset();
+			m_d2dBitmap.put();
 
-			m_depthStencilView.Reset();
-			m_depthBuffer.Reset();
+			m_depthStencilView.put();
+			m_depthBuffer.put();
 
-			m_renderTargetView.Reset();
-			m_backBuffer.Reset();
+			m_renderTargetView.put();
+			m_backBuffer.put();
 
 			DX::ThrowIfFailed(
 				m_swapChain->ResizeBuffers(0, width, height, m_backBufferFormat, 0)
@@ -225,31 +230,25 @@ namespace DX
 			scd.Width = static_cast<UINT>(m_viewport.Width);
 			scd.Height = static_cast<UINT>(m_viewport.Height);
 			scd.Format = m_backBufferFormat;
+			scd.BufferCount = 2;
 			scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 			scd.SampleDesc.Count = 1;
 			scd.SampleDesc.Quality = 0;
 			scd.Scaling = DXGI_SCALING_STRETCH;
 			scd.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+			scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 			scd.Flags = 0;
 
-//#ifdef WINDOWS_UWP
-			scd.BufferCount = 2;
-			scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-//#else
-//			scd.BufferCount = 1;
-//			scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-//#endif
-
-			ComPtr<IDXGIDevice4> pDevice;
-			m_d3dDevice.As(&pDevice);
+			winrt::com_ptr<IDXGIDevice4> pDevice;
+			m_d3dDevice.as(pDevice);
 
 #ifdef WINDOWS_UWP
 			DX::ThrowIfFailed(
-				m_dxgiFactory->CreateSwapChainForCoreWindow(pDevice.Get(), m_window, &scd, nullptr, m_swapChain.ReleaseAndGetAddressOf())
+				m_dxgiFactory->CreateSwapChainForCoreWindow(pDevice.get(), m_window, &scd, nullptr, m_swapChain.put())
 			);
 #else
 			DX::ThrowIfFailed(
-				m_dxgiFactory->CreateSwapChainForHwnd(pDevice.Get(), m_window, &scd, nullptr, nullptr, m_swapChain.ReleaseAndGetAddressOf())
+				m_dxgiFactory->CreateSwapChainForHwnd(pDevice.get(), m_window, &scd, nullptr, nullptr, m_swapChain.put())
 			);
 
 			DX::ThrowIfFailed(m_dxgiFactory->MakeWindowAssociation(m_window, DXGI_MWA_NO_ALT_ENTER));
@@ -258,7 +257,7 @@ namespace DX
 
 		// Get a reference to the back buffer
 		DX::ThrowIfFailed(
-			m_swapChain->GetBuffer(0, IID_PPV_ARGS(m_backBuffer.ReleaseAndGetAddressOf()))
+			m_swapChain->GetBuffer(0, IID_PPV_ARGS(m_backBuffer.put()))
 		);
 
 		// Create render target view
@@ -266,7 +265,7 @@ namespace DX
 			CD3D11_RENDER_TARGET_VIEW_DESC1 rd(D3D11_RTV_DIMENSION_TEXTURE2D, m_backBufferFormat);
 
 			DX::ThrowIfFailed(
-				GetD3DDevice()->CreateRenderTargetView1(m_backBuffer.Get(), &rd, m_renderTargetView.ReleaseAndGetAddressOf())
+				GetD3DDevice()->CreateRenderTargetView1(m_backBuffer.get(), &rd, m_renderTargetView.put())
 			);
 		}
 
@@ -286,7 +285,7 @@ namespace DX
 			depthBufferDesc.CPUAccessFlags = 0;
 			depthBufferDesc.MiscFlags = 0;
 
-			DX::ThrowIfFailed(GetD3DDevice()->CreateTexture2D1(&depthBufferDesc, nullptr, m_depthBuffer.ReleaseAndGetAddressOf()));
+			DX::ThrowIfFailed(GetD3DDevice()->CreateTexture2D1(&depthBufferDesc, nullptr, m_depthBuffer.put()));
 
 			D3D11_DEPTH_STENCIL_VIEW_DESC dsv = {};
 			dsv.Texture2D.MipSlice = 0;
@@ -294,17 +293,17 @@ namespace DX
 			dsv.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 
 			DX::ThrowIfFailed(
-				m_d3dDevice->CreateDepthStencilView(m_depthBuffer.Get(), &dsv, m_depthStencilView.ReleaseAndGetAddressOf())
+				m_d3dDevice->CreateDepthStencilView(m_depthBuffer.get(), &dsv, m_depthStencilView.put())
 			);
 		}
 
 		// Direct2D render target
 		{
-			wrl::ComPtr<IDXGISurface> pSurface;
+			winrt::com_ptr<IDXGISurface> pSurface;
 
 			// Get a reference to the back buffer
 			DX::ThrowIfFailed(
-				m_swapChain->GetBuffer(0, IID_PPV_ARGS(pSurface.ReleaseAndGetAddressOf()))
+				m_swapChain->GetBuffer(0, IID_PPV_ARGS(pSurface.put()))
 			);
 
 			const auto props = D2D1::BitmapProperties1(
@@ -315,16 +314,16 @@ namespace DX
 			// Create bitmap
 			DX::ThrowIfFailed(
 				m_d2dDeviceContext->CreateBitmapFromDxgiSurface(
-					pSurface.Get(),
+					pSurface.get(),
 					props,
-					m_d2dBitmap.ReleaseAndGetAddressOf()
+					m_d2dBitmap.put()
 				)
 			);
 
 			// Set render target
-			m_d2dDeviceContext->SetTarget(m_d2dBitmap.Get());
+			m_d2dDeviceContext->SetTarget(m_d2dBitmap.get());
 
-			pSurface.Reset();
+			pSurface.put();
 		}
 	}
 }

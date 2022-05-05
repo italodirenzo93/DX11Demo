@@ -20,11 +20,11 @@ namespace DX
 	{
 		m_vsBlob = ReadData(L"VertexShader.cso");
 
-		DX::ThrowIfFailed(device->CreateVertexShader(m_vsBlob.data(), m_vsBlob.size(), nullptr, m_vs.ReleaseAndGetAddressOf()));
+		DX::ThrowIfFailed(device->CreateVertexShader(m_vsBlob.data(), m_vsBlob.size(), nullptr, m_vs.put()));
 
 		auto psBlob = ReadData(L"PixelShader.cso");
 
-		DX::ThrowIfFailed(device->CreatePixelShader(psBlob.data(), psBlob.size(), nullptr, m_ps.ReleaseAndGetAddressOf()));
+		DX::ThrowIfFailed(device->CreatePixelShader(psBlob.data(), psBlob.size(), nullptr, m_ps.put()));
 
 		m_commonStates = std::make_unique<CommonStates>(device);
 	}
@@ -52,14 +52,14 @@ namespace DX
 		const auto cb = m_constantBuffer.GetBuffer();
 		deviceContext->VSSetConstantBuffers(0, 1, &cb);
 
-		const auto sr = m_texture.Get();
+		const auto sr = m_texture.get();
 		deviceContext->PSSetShaderResources(0, 1, &sr);
 
 		const auto samplers = m_commonStates->PointClamp();
 		deviceContext->PSSetSamplers(0, 1, &samplers);
 
-		deviceContext->VSSetShader(m_vs.Get(), nullptr, 0);
-		deviceContext->PSSetShader(m_ps.Get(), nullptr, 0);
+		deviceContext->VSSetShader(m_vs.get(), nullptr, 0);
+		deviceContext->PSSetShader(m_ps.get(), nullptr, 0);
 	}
 
 	void MyEffect::GetVertexShaderBytecode(void const** pShaderBytecode, size_t* pBytecodeLength)
@@ -95,7 +95,7 @@ namespace DX
 		m_dirtyFlags |= DirtyWVPMatrix;
 	}
 
-	void MyEffect::SetTexture(ID3D11ShaderResourceView* texture)
+	void MyEffect::SetTexture(const winrt::com_ptr<ID3D11ShaderResourceView>& texture)
 	{
 		m_texture = texture;
 	}

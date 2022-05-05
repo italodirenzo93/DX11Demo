@@ -16,15 +16,11 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(pCmdLine);
 
+	winrt::init_apartment();
+
 	if (!XMVerifyCPUSupport())
 	{
 		MessageBox(nullptr, L"CPU unsupported.", L"Error", MB_OK);
-		return 1;
-	}
-
-	if (FAILED(CoInitializeEx(nullptr, COINITBASE_MULTITHREADED)))
-	{
-		MessageBox(nullptr, L"Failed to initialize multi-threaded apartment.", L"Error", MB_OK);
 		return 1;
 	}
 
@@ -61,7 +57,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 	g_scene.reset();
 
-	CoUninitialize();
+	winrt::uninit_apartment();
 
 	return static_cast<int>(msg.wParam);
 }

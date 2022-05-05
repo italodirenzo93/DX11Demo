@@ -114,7 +114,7 @@ void SampleScene::CreateDeviceDependentResources()
 				MyEffect::InputLayoutCount,
 				bytecodeData,
 				bytecodeLength,
-				m_inputLayout.ReleaseAndGetAddressOf()
+				m_inputLayout.put()
 			)
 		);
 	}
@@ -127,11 +127,11 @@ void SampleScene::CreateDeviceDependentResources()
 				m_deviceResources->GetD3DDeviceContext(),
 				L"braynzar.dds",
 				nullptr,
-				m_cubeTexture.ReleaseAndGetAddressOf()
+				m_cubeTexture.put()
 			)
 		);
 
-		m_effect->SetTexture(m_cubeTexture.Get());
+		m_effect->SetTexture(m_cubeTexture);
 	}
 
 	DX::ThrowIfFailed(
@@ -143,7 +143,7 @@ void SampleScene::CreateDeviceDependentResources()
 			DWRITE_FONT_STRETCH_NORMAL,
 			24.0f,
 			L"en-us",
-			m_textFormat.ReleaseAndGetAddressOf()
+			m_textFormat.put()
 		)
 	);
 }
@@ -157,7 +157,7 @@ void SampleScene::CreateWindowSizeDependentResources()
 
 	m_camera->SetPosition(Vector3(0.0f, 0.0f, -3.0f));
 
-	m_deviceResources->GetD2DDeviceContext()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), m_brush.ReleaseAndGetAddressOf());
+	m_deviceResources->GetD2DDeviceContext()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), m_brush.put());
 }
 
 void SampleScene::Update(const StepTimer& timer)
@@ -262,7 +262,7 @@ void SampleScene::Render()
 
 	// Input assembler
 	ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	ctx->IASetInputLayout(m_inputLayout.Get());
+	ctx->IASetInputLayout(m_inputLayout.get());
 
 	// Draw each cube
 	for (auto& obj : m_objects)
@@ -293,14 +293,14 @@ void SampleScene::Render()
 		d2dContext->DrawText(
 			text.c_str(),
 			static_cast<UINT32>(text.length()),
-			m_textFormat.Get(),
+			m_textFormat.get(),
 			D2D1::RectF(
 				float(size.left + 5),
 				float(size.top + 5),
 				float(size.right - 5),
 				float(size.bottom - 5)
 			),
-			m_brush.Get()
+			m_brush.get()
 		);
 
 		d2dContext->EndDraw();

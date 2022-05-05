@@ -41,8 +41,8 @@ private:
 	std::unique_ptr<DX::MyEffect> m_effect;
 	std::unique_ptr<DX::PerspectiveCamera> m_camera;
 
-	wrl::ComPtr<ID2D1SolidColorBrush> m_brush;
-	wrl::ComPtr<IDWriteTextFormat> m_textFormat;
+	winrt::com_ptr<ID2D1SolidColorBrush> m_brush;
+	winrt::com_ptr<IDWriteTextFormat> m_textFormat;
 
 	std::vector<DX::CubeObject> m_objects;
 
@@ -51,8 +51,8 @@ private:
 	std::unique_ptr<DirectX::Mouse> m_mouse;
 	std::unique_ptr<DirectX::GamePad> m_gamepad;
 
-	wrl::ComPtr<ID3D11InputLayout> m_inputLayout;
-	wrl::ComPtr<ID3D11ShaderResourceView> m_cubeTexture;
+	winrt::com_ptr<ID3D11InputLayout> m_inputLayout;
+	winrt::com_ptr<ID3D11ShaderResourceView> m_cubeTexture;
 
 	DX::DeviceResources::WindowHandle m_window;
 };

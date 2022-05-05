@@ -10,8 +10,18 @@
 
 #include <Windows.h>
 
-// For ComPtr<T>
-#include <wrl/client.h>
+// For winrt::com_ptr<T>
+#include <winrt/base.h>
+
+#ifdef WINDOWS_UWP
+#include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Foundation.Collections.h>
+#include <winrt/Windows.ApplicationModel.Core.h>
+#include <winrt/Windows.Graphics.Display.Core.h>
+#include <winrt/Windows.UI.Core.h>
+#include <winrt/Windows.UI.Composition.h>
+#include <winrt/Windows.UI.Input.h>
+#endif
 
 // DirectX headers
 #include <d3d11_4.h>
@@ -51,7 +61,6 @@
 #include <VertexTypes.h>
 
 // Namespace aliases
-namespace wrl = Microsoft::WRL;
 namespace math = DirectX::SimpleMath;
 
 namespace DX

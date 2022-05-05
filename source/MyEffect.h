@@ -15,12 +15,12 @@ namespace DX
 		void XM_CALLCONV SetProjection(DirectX::FXMMATRIX value) override;
 		void XM_CALLCONV SetMatrices(DirectX::FXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection) override;
 
-		void SetTexture(ID3D11ShaderResourceView* texture);
+		void SetTexture(const winrt::com_ptr<ID3D11ShaderResourceView>& texture);
 
 	private:
-		wrl::ComPtr<ID3D11VertexShader> m_vs;
-		wrl::ComPtr<ID3D11PixelShader> m_ps;
-		wrl::ComPtr<ID3D11ShaderResourceView> m_texture;
+		winrt::com_ptr<ID3D11VertexShader> m_vs;
+		winrt::com_ptr<ID3D11PixelShader> m_ps;
+		winrt::com_ptr<ID3D11ShaderResourceView> m_texture;
 		std::vector<uint8_t> m_vsBlob;
 
 		DirectX::SimpleMath::Matrix m_world;
