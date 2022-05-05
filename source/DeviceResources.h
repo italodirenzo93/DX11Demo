@@ -38,6 +38,8 @@ namespace DX
 		void CreateWindowSizeDependentResources();
 		void SetWindow(WindowHandle window, int width, int height) noexcept;
 
+		void Present(bool vSync) const;
+
 	private:
 		void CreateDeviceIndependentResources();
 		void CreateDeviceDependentResources();

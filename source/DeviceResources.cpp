@@ -67,6 +67,16 @@ namespace DX
 		m_outputSize.bottom = height;
 	}
 
+	void DeviceResources::Present(bool vSync) const
+	{
+		DXGI_PRESENT_PARAMETERS params = {};
+		// Add some params here when needed...
+
+		winrt::check_hresult(
+			m_swapChain->Present1(UINT(vSync), 0, &params)
+		);
+	}
+
 	void DeviceResources::CreateDeviceResources()
 	{
 		CreateDeviceIndependentResources();

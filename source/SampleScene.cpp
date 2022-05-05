@@ -285,7 +285,6 @@ void SampleScene::Render()
 		const auto size = m_deviceResources->GetOutputSize();
 		const auto d2dContext = m_deviceResources->GetD2DDeviceContext();
 		
-
 		d2dContext->BeginDraw();
 
 		static const std::wstring text = L"Hello World!";
@@ -307,5 +306,5 @@ void SampleScene::Render()
 	}
 
 	// Show the back buffer
-	m_deviceResources->GetSwapChain()->Present(1, 0);
+	m_deviceResources->Present(true);
 }
