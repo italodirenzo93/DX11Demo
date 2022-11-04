@@ -57,8 +57,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 	g_scene.reset();
 
-	winrt::uninit_apartment();
-
 	return static_cast<int>(msg.wParam);
 }
 
